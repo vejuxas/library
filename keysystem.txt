@@ -421,20 +421,30 @@ do
 		
 		-- Close functionality with animation
 		closeBtn.MouseButton1Click:Connect(function()
-			-- Closing animation: shrink and fade out
-			utility:Tween(main, {
+			-- Disable the button to prevent multiple clicks
+			closeBtn.Active = false
+			
+			-- Create the closing animation tween
+			local closeTween = tween:Create(main, tweeninfo(0.4, Enum.EasingStyle.Back), {
 				Size = UDim2.new(0, 0, 0, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0) -- Center it before shrinking
-			}, 0.4, Enum.EasingStyle.Back)
+			})
 			
 			-- Fade out the entire container
-			utility:Tween(container, {
+			local fadeTween = tween:Create(container, tweeninfo(0.4), {
 				BackgroundTransparency = 1
-			}, 0.4)
+			})
+			
+			-- Start both animations
+			closeTween:Play()
+			fadeTween:Play()
 			
 			-- Destroy after animation completes
-			wait(0.4)
-			container:Destroy()
+			closeTween.Completed:Connect(function()
+				if container and container.Parent then
+					container:Destroy()
+				end
+			end)
 		end)
 		
 		-- Hover effects
