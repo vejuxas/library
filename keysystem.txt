@@ -352,9 +352,9 @@ do
 				
 				-- Rotate button to + and change text
 				utility:Tween(minimizeBtn, {
-					Rotation = 45,
-					Text = "+"
+					Rotation = 45
 				}, 0.3)
+				minimizeBtn.Text = "+"
 				
 				-- Hide content
 				main.Pages.Visible = false
@@ -371,9 +371,9 @@ do
 				
 				-- Rotate button back to - and change text
 				utility:Tween(minimizeBtn, {
-					Rotation = 0,
-					Text = "-"
+					Rotation = 0
 				}, 0.3)
+				minimizeBtn.Text = "-"
 				
 				-- Show content
 				main.Pages.Visible = true
@@ -2079,7 +2079,7 @@ do
 		end
 		
 		self.container.CanvasSize = UDim2.new(0, 0, 0, size)
-		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y
+		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y and 1 or 0
 		
 		if scroll then
 			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
