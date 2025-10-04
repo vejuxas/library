@@ -203,6 +203,9 @@ local library = {} -- main
 local page = {}
 local section = {}
 
+-- Global library instance tracking
+local libraryInstances = {}
+
 do
 	library.__index = library
 	page.__index = page
@@ -211,6 +214,17 @@ do
 	-- new classes
 	
 	function library.new(title)
+		-- Check if library already exists
+		if libraryInstances[title] then
+			print("Library", title, "already exists, destroying old instance")
+			libraryInstances[title]:Destroy()
+		end
+		
+		local existingLibrary = game.CoreGui:FindFirstChild(title)
+		if existingLibrary then
+			existingLibrary:Destroy()
+		end
+		
 		local container = utility:Create("ScreenGui", {
 			Name = title,
 			Parent = game.CoreGui
@@ -368,10 +382,19 @@ do
 		
 		-- Button functionality
 		local main = container.Main
+		if not main then return end
+		
 		local topbar = main.TopBar
-		local minimizeBtn = topbar.MinimizeButton
-		local resizeBtn = topbar.ResizeButton
-		local closeBtn = topbar.CloseButton
+		if not topbar then return end
+		
+		local minimizeBtn = topbar:FindFirstChild("MinimizeButton")
+		local resizeBtn = topbar:FindFirstChild("ResizeButton")
+		local closeBtn = topbar:FindFirstChild("CloseButton")
+		
+		if not minimizeBtn or not resizeBtn or not closeBtn then
+			print("Warning: Some buttons not found in TopBar")
+			return
+		end
 		
 		-- Minimize functionality
 		local isMinimized = false
@@ -379,7 +402,7 @@ do
 		local originalPosition = main.Position
 		
 		minimizeBtn.MouseButton1Down:Connect(function()
-			if not isMinimized then
+			if not isMinimized and main and main.Pages then
 				-- Minimize: shrink to just the top bar
 				isMinimized = true
 				utility:Tween(main, {
@@ -399,7 +422,7 @@ do
 		end)
 		
 		minimizeBtn.MouseButton1Up:Connect(function()
-			if isMinimized then
+			if isMinimized and main and main.Pages then
 				-- Restore: bring back to original size
 				isMinimized = false
 				utility:Tween(main, {
@@ -659,6 +682,9 @@ do
 		function library:getKeySystemStatus()
 			return keySystemEnabled, keySystemPastebinURL
 		end
+		
+		-- Track this library instance
+		libraryInstances[title] = container
 		
 		return setmetatable({
 			container = container,
