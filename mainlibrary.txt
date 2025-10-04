@@ -501,10 +501,393 @@ do
 			utility:Tween(closeBtn, {TextColor3 = themes.TextColor}, 0.2)
 		end)
 		
+		-- KeySystem integration
+		local keySystemEnabled = false
+		local keySystemPastebinURL = "https://pastebin.com/raw/xc47552n"
+		
+		-- Function to enable/disable KeySystem
+		function library:setKeySystem(enabled, pastebinURL)
+			keySystemEnabled = enabled
+			if pastebinURL then
+				keySystemPastebinURL = pastebinURL
+			end
+			
+			if enabled then
+				-- Load and run KeySystem with the specified URL
+				spawn(function()
+					-- Load the KeySystem script
+					local keySystemCode = [[
+						-- Key System for DarkWare Script
+						-- Matches Venyx UI Library style
+
+						local Players = game:GetService("Players")
+						local UserInputService = game:GetService("UserInputService")
+						local TweenService = game:GetService("TweenService")
+						local RunService = game:GetService("RunService")
+
+						local LocalPlayer = Players.LocalPlayer
+						local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+						-- Key System Variables
+						local keyEnabled = false
+						local keyText = "DarkwareScript" -- Default fallback
+						local keyInput = ""
+						local keyAttempts = 0
+						local maxAttempts = 3
+
+						-- Pastebin URL for the key (will be set dynamically)
+						local PASTEBIN_URL = "]] .. keySystemPastebinURL .. [["
+
+						-- Function to fetch key from Pastebin
+						local function fetchKeyFromPastebin()
+							local success, result = pcall(function()
+								return game:HttpGet(PASTEBIN_URL)
+							end)
+							
+							if success and result then
+								-- Clean the result (remove whitespace/newlines)
+								local cleanKey = string.gsub(result, "%s+", "")
+								if cleanKey ~= "" then
+									keyText = cleanKey
+									print("Key fetched from Pastebin:", keyText)
+									return true
+								end
+							end
+							
+							print("Failed to fetch key from Pastebin, using default:", keyText)
+							return false
+						end
+
+						-- Function to refresh key from Pastebin (can be called manually)
+						local function refreshKey()
+							print("Refreshing key from Pastebin...")
+							return fetchKeyFromPastebin()
+						end
+
+						-- Venyx-style themes
+						local themes = {
+							Background = Color3.fromRGB(24, 24, 24),
+							Glow = Color3.fromRGB(0, 0, 0),
+							Accent = Color3.fromRGB(10, 10, 10),
+							LightContrast = Color3.fromRGB(20, 20, 20),
+							DarkContrast = Color3.fromRGB(14, 14, 14),
+							TextColor = Color3.fromRGB(255, 255, 255),
+							ErrorColor = Color3.fromRGB(255, 100, 100),
+							SuccessColor = Color3.fromRGB(100, 255, 100)
+						}
+
+						-- Create Key System UI
+						local function createKeySystem()
+							-- Fetch key from Pastebin first
+							fetchKeyFromPastebin()
+							
+							-- Main ScreenGui
+							local KeyScreenGui = Instance.new("ScreenGui")
+							KeyScreenGui.Name = "KeySystem"
+							KeyScreenGui.Parent = PlayerGui
+							KeyScreenGui.ResetOnSpawn = false
+							
+							-- Main Container (Venyx style) - Mobile responsive
+							local MainContainer = Instance.new("ImageLabel")
+							MainContainer.Name = "MainContainer"
+							-- Use UDim2 for responsive sizing - smaller on mobile
+							local isMobile = UserInputService.TouchEnabled
+							local containerWidth = isMobile and 0.8 or 0.3  -- 80% width on mobile, 30% on desktop
+							local containerHeight = isMobile and 0.15 or 0.1  -- 15% height on mobile, 10% on desktop
+							MainContainer.Size = UDim2.new(containerWidth, 0, containerHeight, 0)
+							MainContainer.Position = UDim2.new(1, -360, 0.9, -50) -- Right corner, lower down
+							MainContainer.BackgroundTransparency = 1
+							MainContainer.Image = "rbxassetid://4641149554"
+							MainContainer.ImageColor3 = themes.Background
+							MainContainer.ScaleType = Enum.ScaleType.Slice
+							MainContainer.SliceCenter = Rect.new(4, 4, 296, 296)
+							MainContainer.Parent = KeyScreenGui
+
+							-- Glow effect
+							local Glow = Instance.new("ImageLabel")
+							Glow.Name = "Glow"
+							Glow.BackgroundTransparency = 1
+							Glow.Position = UDim2.new(0, -15, 0, -15)
+							Glow.Size = UDim2.new(1, 30, 1, 30)
+							Glow.ZIndex = 0
+							Glow.Image = "rbxassetid://5028857084"
+							Glow.ImageColor3 = themes.Glow
+							Glow.ScaleType = Enum.ScaleType.Slice
+							Glow.SliceCenter = Rect.new(24, 24, 276, 276)
+							Glow.Parent = MainContainer
+
+							-- Top Bar
+							local TopBar = Instance.new("ImageLabel")
+							TopBar.Name = "TopBar"
+							TopBar.BackgroundTransparency = 1
+							TopBar.Size = UDim2.new(1, 0, 0, 30)
+							TopBar.ZIndex = 5
+							TopBar.Image = "rbxassetid://4595286933"
+							TopBar.ImageColor3 = themes.Accent
+							TopBar.ScaleType = Enum.ScaleType.Slice
+							TopBar.SliceCenter = Rect.new(4, 4, 296, 296)
+							TopBar.Parent = MainContainer
+
+							-- Title
+							local Title = Instance.new("TextLabel")
+							Title.Name = "Title"
+							Title.BackgroundTransparency = 1
+							Title.Size = UDim2.new(1, -100, 1, 0)
+							Title.Position = UDim2.new(0, 10, 0, 0)
+							Title.Text = "DarkWare Key"
+							Title.TextColor3 = themes.TextColor
+							Title.TextSize = isMobile and 18 or 14  -- Larger text on mobile
+							Title.Font = Enum.Font.GothamBold
+							Title.TextXAlignment = Enum.TextXAlignment.Left
+							Title.ZIndex = 6
+							Title.Parent = TopBar
+
+							-- Close Button
+							local CloseButton = Instance.new("ImageButton")
+							CloseButton.Name = "CloseButton"
+							CloseButton.Size = UDim2.new(0, 20, 0, 20)
+							CloseButton.Position = UDim2.new(1, -25, 0.5, -10)
+							CloseButton.BackgroundTransparency = 1
+							CloseButton.Image = "rbxassetid://5012538583"
+							CloseButton.ImageColor3 = themes.TextColor
+							CloseButton.ZIndex = 6
+							CloseButton.Parent = TopBar
+
+							-- Content Container
+							local ContentContainer = Instance.new("Frame")
+							ContentContainer.Name = "ContentContainer"
+							ContentContainer.Size = UDim2.new(1, -20, 1, -40)
+							ContentContainer.Position = UDim2.new(0, 10, 0, 35)
+							ContentContainer.BackgroundTransparency = 1
+							ContentContainer.Parent = MainContainer
+
+							-- Key Input Section
+							local KeySection = Instance.new("ImageLabel")
+							KeySection.Name = "KeySection"
+							KeySection.Size = UDim2.new(1, 0, 0, 25)
+							KeySection.Position = UDim2.new(0, 0, 0, 5)
+							KeySection.BackgroundTransparency = 1
+							KeySection.Image = "rbxassetid://5028857472"
+							KeySection.ImageColor3 = themes.DarkContrast
+							KeySection.ScaleType = Enum.ScaleType.Slice
+							KeySection.SliceCenter = Rect.new(2, 2, 298, 298)
+							KeySection.Parent = ContentContainer
+
+							-- Key Input Label
+							local KeyLabel = Instance.new("TextLabel")
+							KeyLabel.Name = "KeyLabel"
+							KeyLabel.Size = UDim2.new(0, 60, 1, 0)
+							KeyLabel.Position = UDim2.new(0, 8, 0, 0)
+							KeyLabel.BackgroundTransparency = 1
+							KeyLabel.Text = "Key:"
+							KeyLabel.TextColor3 = themes.TextColor
+							KeyLabel.TextSize = 12
+							KeyLabel.Font = Enum.Font.Gotham
+							KeyLabel.TextXAlignment = Enum.TextXAlignment.Left
+							KeyLabel.Parent = KeySection
+
+							-- Key Input Box
+							local KeyInputBox = Instance.new("ImageLabel")
+							KeyInputBox.Name = "KeyInputBox"
+							KeyInputBox.Size = UDim2.new(1, -75, 0, 18)
+							KeyInputBox.Position = UDim2.new(0, 70, 0.5, -9)
+							KeyInputBox.BackgroundTransparency = 1
+							KeyInputBox.Image = "rbxassetid://5028857472"
+							KeyInputBox.ImageColor3 = themes.LightContrast
+							KeyInputBox.ScaleType = Enum.ScaleType.Slice
+							KeyInputBox.SliceCenter = Rect.new(2, 2, 298, 298)
+							KeyInputBox.Parent = KeySection
+
+							-- Key TextBox
+							local KeyTextBox = Instance.new("TextBox")
+							KeyTextBox.Name = "KeyTextBox"
+							KeyTextBox.Size = UDim2.new(1, -10, 1, 0)
+							KeyTextBox.Position = UDim2.new(0, 5, 0, 0)
+							KeyTextBox.BackgroundTransparency = 1
+							KeyTextBox.Text = ""
+							KeyTextBox.PlaceholderText = "Type key and press Enter..."
+							KeyTextBox.TextColor3 = themes.TextColor
+							KeyTextBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+							KeyTextBox.TextSize = isMobile and 16 or 12  -- Larger text on mobile
+							KeyTextBox.Font = Enum.Font.Gotham
+							KeyTextBox.TextXAlignment = Enum.TextXAlignment.Left
+							KeyTextBox.Parent = KeyInputBox
+
+							-- Status Message (appears above input)
+							local StatusMessage = Instance.new("TextLabel")
+							StatusMessage.Name = "StatusMessage"
+							StatusMessage.Size = UDim2.new(1, -20, 0, 15)
+							StatusMessage.Position = UDim2.new(0, 10, 0, -5)
+							StatusMessage.BackgroundTransparency = 1
+							StatusMessage.Text = ""
+							StatusMessage.TextColor3 = themes.TextColor -- White text
+							StatusMessage.TextSize = isMobile and 14 or 10  -- Larger text on mobile
+							StatusMessage.Font = Enum.Font.Gotham
+							StatusMessage.TextXAlignment = Enum.TextXAlignment.Center
+							StatusMessage.TextTransparency = 1 -- Start invisible
+							StatusMessage.Parent = ContentContainer
+
+							-- Key validation function
+							local function validateKey(input)
+								-- Case insensitive comparison
+								return string.lower(input) == string.lower(keyText)
+							end
+
+							-- Submit function
+							local function submitKey()
+								local input = KeyTextBox.Text
+								print("Submit function called with input:", input)
+								
+								if input == "" then
+									print("Empty input, returning")
+									return
+								end
+								
+								if validateKey(input) then
+									print("Key is valid!")
+									keyEnabled = true
+									
+									-- Success animation - shrink to close button position
+									local successTween = TweenService:Create(MainContainer, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+										Size = UDim2.new(0, 0, 0, 0),
+										Position = UDim2.new(1, -360, 0.9, -50) -- Shrink to close button position
+									})
+									successTween:Play()
+									successTween.Completed:Connect(function()
+										KeyScreenGui:Destroy()
+										-- Enable main script functionality here
+										print("Key system passed! Main script can now run.")
+									end)
+								else
+									print("Key is invalid!")
+									
+									-- Show "Invalid Key" message above input
+									StatusMessage.Text = "Invalid Key"
+									StatusMessage.TextTransparency = 0
+									print("Showing Invalid Key message")
+									
+									-- Clear textbox first
+									KeyTextBox.Text = ""
+									
+									-- Fade out after 2 seconds using spawn to avoid blocking
+									spawn(function()
+										wait(2)
+										local fadeTween = TweenService:Create(StatusMessage, TweenInfo.new(0.5), {
+											TextTransparency = 1
+										})
+										fadeTween:Play()
+										fadeTween.Completed:Connect(function()
+											StatusMessage.Text = "" -- Clear text after fade
+										end)
+									end)
+								end
+							end
+
+							-- Enter key submission
+							UserInputService.InputBegan:Connect(function(input, gameProcessed)
+								if gameProcessed then return end
+								
+								if input.KeyCode == Enum.KeyCode.Return and KeyTextBox:IsFocused() then
+									submitKey()
+								end
+							end)
+
+							-- Auto-focus on load
+							KeyTextBox:CaptureFocus()
+
+							-- Close button functionality
+							CloseButton.MouseButton1Click:Connect(function()
+								-- Close animation shrinking to top-left corner
+								local closeTween = TweenService:Create(MainContainer, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+									Size = UDim2.new(0, 0, 0, 0),
+									Position = UDim2.new(1, -360, 0.9, -50) -- Shrink to close button position
+								})
+								closeTween:Play()
+								closeTween.Completed:Connect(function()
+									KeyScreenGui:Destroy()
+								end)
+							end)
+
+							-- Close button hover animations
+							CloseButton.MouseEnter:Connect(function()
+								local hoverTween = TweenService:Create(CloseButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+									ImageColor3 = Color3.fromRGB(255, 100, 100), -- Red color
+									Rotation = -15 -- Rotate left by 15 degrees
+								})
+								hoverTween:Play()
+							end)
+
+							CloseButton.MouseLeave:Connect(function()
+								local leaveTween = TweenService:Create(CloseButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+									ImageColor3 = themes.TextColor, -- Back to original color
+									Rotation = 0 -- Back to original rotation
+								})
+								leaveTween:Play()
+							end)
+
+							-- Dragging functionality (from KeySystem)
+							local dragging = false
+							local dragInput = nil
+							local dragStart = nil
+							local startPos = nil
+							
+							local function update(input)
+								local delta = input.Position - dragStart
+								MainContainer.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+							end
+							
+							TopBar.InputBegan:Connect(function(input)
+								if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+									dragging = true
+									dragStart = input.Position
+									startPos = MainContainer.Position
+									
+									input.Changed:Connect(function()
+										if input.UserInputState == Enum.UserInputState.End then
+											dragging = false
+										end
+									end)
+								end
+							end)
+							
+							TopBar.InputChanged:Connect(function(input)
+								if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+									dragInput = input
+								end
+							end)
+							
+							UserInputService.InputChanged:Connect(function(input)
+								if input == dragInput and dragging then
+									update(input)
+								end
+							end)
+						end
+
+						-- Create the KeySystem
+						createKeySystem()
+					]]
+					
+					-- Execute the KeySystem code
+					loadstring(keySystemCode)()
+				end)
+				print("KeySystem enabled with URL:", keySystemPastebinURL)
+			else
+				-- Disable KeySystem if needed
+				print("KeySystem disabled")
+			end
+		end
+		
+		-- Function to get KeySystem status
+		function library:getKeySystemStatus()
+			return keySystemEnabled, keySystemPastebinURL
+		end
+		
 		return setmetatable({
 			container = container,
 			pagesContainer = container.Main.Pages.Pages_Container,
-			pages = {}
+			pages = {},
+			keySystemEnabled = keySystemEnabled,
+			keySystemPastebinURL = keySystemPastebinURL
 		}, library)
 	end
 	
