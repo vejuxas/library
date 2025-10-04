@@ -435,6 +435,45 @@ do
 			end
 		end)
 		
+		-- Resize functionality
+		local isResizing = false
+		local startMousePos = nil
+		local startSize = nil
+		local minWidth = 200
+		local minHeight = 100
+		local maxWidth = 800
+		local maxHeight = 600
+		
+		resizeBtn.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				isResizing = true
+				startMousePos = input.Position
+				startSize = main.Size
+			end
+		end)
+		
+		resizeBtn.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				isResizing = false
+				startMousePos = nil
+				startSize = nil
+			end
+		end)
+		
+		-- Use RunService for smooth resizing
+		run.Heartbeat:Connect(function()
+			if isResizing and startMousePos and startSize then
+				local currentMousePos = input:GetMouseLocation()
+				local deltaX = currentMousePos.X - startMousePos.X
+				local deltaY = currentMousePos.Y - startMousePos.Y
+				
+				local newWidth = math.clamp(startSize.X.Offset + deltaX, minWidth, maxWidth)
+				local newHeight = math.clamp(startSize.Y.Offset + deltaY, minHeight, maxHeight)
+				
+				main.Size = UDim2.new(0, newWidth, 0, newHeight)
+			end
+		end)
+		
 		-- Close functionality with animation
 		closeBtn.MouseButton1Click:Connect(function()
 			-- Disable the button to prevent multiple clicks
@@ -463,6 +502,13 @@ do
 		end)
 		minimizeBtn.MouseLeave:Connect(function()
 			utility:Tween(minimizeBtn, {TextColor3 = themes.TextColor}, 0.2)
+		end)
+		
+		resizeBtn.MouseEnter:Connect(function()
+			utility:Tween(resizeBtn, {TextColor3 = Color3.fromRGB(100, 200, 255)}, 0.2)
+		end)
+		resizeBtn.MouseLeave:Connect(function()
+			utility:Tween(resizeBtn, {TextColor3 = themes.TextColor}, 0.2)
 		end)
 		
 		closeBtn.MouseEnter:Connect(function()
