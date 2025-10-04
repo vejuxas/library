@@ -352,7 +352,8 @@ do
 				
 				-- Rotate button to + and change text
 				utility:Tween(minimizeBtn, {
-					Rotation = 45
+					Rotation = 45,
+					TextSize = 20
 				}, 0.3)
 				minimizeBtn.Text = "+"
 				
@@ -371,7 +372,8 @@ do
 				
 				-- Rotate button back to - and change text
 				utility:Tween(minimizeBtn, {
-					Rotation = 0
+					Rotation = 0,
+					TextSize = 16
 				}, 0.3)
 				minimizeBtn.Text = "-"
 				
