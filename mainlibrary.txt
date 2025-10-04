@@ -2274,13 +2274,19 @@ do
 		local size = 0
 		
 		for i, section in pairs(self.sections) do
-			size = size + section.container.Parent.AbsoluteSize.Y + padding
+			if section.container and section.container.Parent and section.container.Parent.AbsoluteSize then
+				size = size + section.container.Parent.AbsoluteSize.Y + padding
+			end
 		end
 		
-		self.container.CanvasSize = UDim2.new(0, 0, 0, size)
-		self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y and 1 or 0
+		if self.container then
+			self.container.CanvasSize = UDim2.new(0, 0, 0, size)
+			if self.container.AbsoluteSize and self.container.AbsoluteSize.Y then
+				self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y and 1 or 0
+			end
+		end
 		
-		if scroll then
+		if scroll and self.container then
 			utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2)
 		end
 	end
@@ -2291,18 +2297,30 @@ do
 			return
 		end
 		
+		if not self.container or not self.container.Parent then
+			return
+		end
+		
 		local padding = 4
-		local size = (4 * padding) + self.container.Title.AbsoluteSize.Y -- offset
+		local size = (4 * padding)
+		
+		if self.container.Title and self.container.Title.AbsoluteSize then
+			size = size + self.container.Title.AbsoluteSize.Y -- offset
+		end
 		
 		for i, module in pairs(self.modules) do
-			size = size + module.AbsoluteSize.Y + padding
+			if module and module.AbsoluteSize then
+				size = size + module.AbsoluteSize.Y + padding
+			end
 		end
 		
 		if smooth then
 			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 0.05)
 		else
 			self.container.Parent.Size = UDim2.new(1, -10, 0, size)
-			self.page:Resize()
+			if self.page and self.page.Resize then
+				self.page:Resize()
+			end
 		end
 	end
 	
