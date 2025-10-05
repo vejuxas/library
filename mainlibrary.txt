@@ -155,18 +155,24 @@ do
 	end
 	
 	function utility:DraggingEnabled(frame, parent)
-	
 		parent = parent or frame
 		
-		-- stolen from wally or kiriot, kek
+		-- Mobile-compatible drag system (from KeySystem)
 		local dragging = false
-		local dragInput, mousePos, framePos
-
+		local dragInput = nil
+		local dragStart = nil
+		local startPos = nil
+		
+		local function update(input)
+			local delta = input.Position - dragStart
+			parent.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+		
 		frame.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				dragging = true
-				mousePos = input.Position
-				framePos = parent.Position
+				dragStart = input.Position
+				startPos = parent.Position
 				
 				input.Changed:Connect(function()
 					if input.UserInputState == Enum.UserInputState.End then
@@ -175,20 +181,18 @@ do
 				end)
 			end
 		end)
-
+		
 		frame.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
-
+		
 		input.InputChanged:Connect(function(input)
 			if input == dragInput and dragging then
-				local delta = input.Position - mousePos
-				parent.Position  = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+				update(input)
 			end
 		end)
-
 	end
 	
 	function utility:DraggingEnded(callback)
