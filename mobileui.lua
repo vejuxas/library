@@ -234,61 +234,6 @@ Tabs.Player:AddSlider("FlySpeed", {
     end
 })
 
--- Jump Power
-local jumpEnabled = false
-local jumpValue = 50
-local originalJumpPower = 50
-local jumpConnection = nil
-
-local function updateJump()
-    if jumpEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        if LocalPlayer.Character.Humanoid.JumpPower ~= jumpValue then
-            LocalPlayer.Character.Humanoid.JumpPower = jumpValue
-        end
-    end
-end
-
--- High Jump Toggle
-Tabs.Player:AddToggle("HighJump", {
-    Title = "High Jump",
-    Default = false,
-    Callback = function(val)
-        jumpEnabled = val
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            if val then
-                originalJumpPower = LocalPlayer.Character.Humanoid.JumpPower
-                LocalPlayer.Character.Humanoid.JumpPower = jumpValue
-                if jumpConnection then jumpConnection:Disconnect() end
-                jumpConnection = game:GetService("RunService").Heartbeat:Connect(updateJump)
-                print("Jump enabled and connection started!")
-            else
-                if jumpConnection then 
-                    jumpConnection:Disconnect() 
-                    jumpConnection = nil
-                end
-                LocalPlayer.Character.Humanoid.JumpPower = originalJumpPower
-                print("Jump disabled and connection stopped!")
-            end
-        else
-            print("No character or humanoid found for jump!")
-        end
-        print("High Jump:", val)
-    end
-})
-
--- Jump Power Slider (Mobile-friendly)
-Tabs.Player:AddSlider("JumpPower", {
-    Title = "Jump Power",
-    Description = "Adjust your jump height",
-    Default = 50,
-    Min = 50,
-    Max = 200,
-    Rounding = 1,
-    Callback = function(val)
-        jumpValue = val
-        print("Jump Power:", val)
-    end
-})
 
 -- Noclip
 local noclipEnabled = false
@@ -428,14 +373,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
         if speedConnection then speedConnection:Disconnect() end
         speedConnection = game:GetService("RunService").Heartbeat:Connect(updateSpeed)
         print("Speed reapplied and connection restarted on respawn:", speedValue)
-    end
-    
-    if jumpEnabled then
-        character:WaitForChild("Humanoid")
-        character.Humanoid.JumpPower = jumpValue
-        if jumpConnection then jumpConnection:Disconnect() end
-        jumpConnection = game:GetService("RunService").Heartbeat:Connect(updateJump)
-        print("Jump Power reapplied and connection restarted on respawn:", jumpValue)
     end
     
     if noclipEnabled then
