@@ -14,9 +14,23 @@ pcall(function()
     ChatService:SetBubbleChatSettings({
         VerticalStudsOffset = 5,  -- Raises chat bubbles higher above characters
         BubbleDuration = 15,
-        MaxDistance = 100
+        MaxDistance = 100,
+        AdorneeName = "Head"  -- Force chat bubbles to attach to head, not bounding box
     })
 end)
+
+-- Function to create chat attachment on character head
+local function createChatAttachment(character)
+    pcall(function()
+        local head = character:WaitForChild("Head", 5)
+        if head and not head:FindFirstChild("ChatAttachment") then
+            local attachment = Instance.new("Attachment")
+            attachment.Name = "ChatAttachment"
+            attachment.Position = Vector3.new(0, 1.5, 0)  -- Above head
+            attachment.Parent = head
+        end
+    end)
+end
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -136,7 +150,7 @@ local function expandPlayerHitbox(player)
         local playerId = tostring(player.UserId)
 
         -- Create a separate fake hitbox part
-        local fakeHitbox = humanoidRootPart:FindFirstChild("ExpandedHitbox")
+        local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
         if not fakeHitbox then
             fakeHitbox = Instance.new("Part")
             fakeHitbox.Name = "ExpandedHitbox"
@@ -147,7 +161,7 @@ local function expandPlayerHitbox(player)
             fakeHitbox.Transparency = 1
             fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
             fakeHitbox.CFrame = humanoidRootPart.CFrame
-            fakeHitbox.Parent = humanoidRootPart
+            fakeHitbox.Parent = character  -- Parent to character, not HumanoidRootPart, to avoid bounding box issues
             
             -- Weld to follow the player
             local weld = Instance.new("WeldConstraint")
@@ -175,12 +189,9 @@ local function restorePlayerHitbox(player)
     local character = player.Character
     if not character then return end
 
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        local fakeHitbox = hrp:FindFirstChild("ExpandedHitbox")
-        if fakeHitbox then
-            fakeHitbox:Destroy()
-        end
+    local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
+    if fakeHitbox then
+        fakeHitbox:Destroy()
     end
 end
 
@@ -656,8 +667,9 @@ end)
 
 -- Handle new players joining
 Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
+    player.CharacterAdded:Connect(function(character)
         wait(0.5)
+        createChatAttachment(character)
         if hitboxEnabled then
             expandPlayerHitbox(player)
         end
@@ -666,12 +678,17 @@ end)
 
 -- Handle player respawning
 for _, player in pairs(Players:GetPlayers()) do
-    player.CharacterAdded:Connect(function()
+    player.CharacterAdded:Connect(function(character)
         wait(0.5)
+        createChatAttachment(character)
         if hitboxEnabled then
             expandPlayerHitbox(player)
         end
     end)
+    -- Create chat attachment for already loaded characters
+    if player.Character then
+        createChatAttachment(player.Character)
+    end
 end
 
 -- Clean up when players leave
