@@ -124,27 +124,35 @@ local function expandPlayerHitbox(player)
     local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
-        
-        if not originalSizes[playerId] then
-            originalSizes[playerId] = humanoidRootPart.Size
-        end
-        
-        humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
-        humanoidRootPart.Transparency = 1
-        humanoidRootPart.CanCollide = false
-        humanoidRootPart.CanTouch = false
-        humanoidRootPart.Material = Enum.Material.ForceField
-        humanoidRootPart.Color = config.hitboxColor
-        
-        -- Use Highlight instead of SelectionBox (prevents chat UI interference)
-        if not selectionBoxes[playerId] then
+
+        -- Create a separate fake hitbox part
+        local fakeHitbox = humanoidRootPart:FindFirstChild("ExpandedHitbox")
+        if not fakeHitbox then
+            fakeHitbox = Instance.new("Part")
+            fakeHitbox.Name = "ExpandedHitbox"
+            fakeHitbox.Anchored = false
+            fakeHitbox.CanCollide = false
+            fakeHitbox.CanTouch = false
+            fakeHitbox.Massless = true
+            fakeHitbox.Transparency = 1
+            fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
+            fakeHitbox.CFrame = humanoidRootPart.CFrame
+            fakeHitbox.Parent = humanoidRootPart
+            
+            -- Weld to follow the player
+            local weld = Instance.new("WeldConstraint")
+            weld.Part0 = humanoidRootPart
+            weld.Part1 = fakeHitbox
+            weld.Parent = fakeHitbox
+
+            -- Highlight outline
             local highlight = Instance.new("Highlight")
-            highlight.Adornee = humanoidRootPart
-            highlight.FillTransparency = 1 -- invisible inside
+            highlight.Name = "ExpandedHighlight"
+            highlight.Adornee = fakeHitbox
+            highlight.FillTransparency = 1
             highlight.OutlineTransparency = 0
             highlight.OutlineColor = config.outlineColor
-            highlight.Parent = humanoidRootPart
-            selectionBoxes[playerId] = highlight
+            highlight.Parent = fakeHitbox
         end
     end
 end
@@ -155,21 +163,12 @@ local function restorePlayerHitbox(player)
     
     local character = player.Character
     if not character then return end
-    
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if humanoidRootPart then
-        local playerId = tostring(player.UserId)
-        
-        if originalSizes[playerId] then
-            humanoidRootPart.Size = originalSizes[playerId]
-            humanoidRootPart.Transparency = 1
-            humanoidRootPart.CanCollide = false
-            humanoidRootPart.Material = Enum.Material.Plastic
-        end
-        
-        if selectionBoxes[playerId] then
-            selectionBoxes[playerId]:Destroy()
-            selectionBoxes[playerId] = nil
+
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        local fakeHitbox = hrp:FindFirstChild("ExpandedHitbox")
+        if fakeHitbox then
+            fakeHitbox:Destroy()
         end
     end
 end
@@ -683,5 +682,4 @@ if autoReloadEnabled then
 else
     print("Auto Reload: DISABLED")
 end
-
 
