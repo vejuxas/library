@@ -14,7 +14,6 @@ local config = _G.hitboxConfig or {
     hitboxTransparency = 0.3,
     hitboxColor = Color3.fromRGB(1, 97, 121),
     outlineColor = Color3.fromRGB(255, 255, 255),
-    showOutline = false,
     hitboxKey = "T",
     triggerKey = "Y",
     rapidFireKey = "P",
@@ -132,20 +131,17 @@ local function expandPlayerHitbox(player)
         
         humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
         humanoidRootPart.Transparency = 1 -- Fully transparent so it doesn't block anything
-        humanoidRootPart.LocalTransparencyModifier = 1 -- Invisible for local player
         humanoidRootPart.CanCollide = false
         humanoidRootPart.CanTouch = false
         humanoidRootPart.Material = Enum.Material.ForceField
         humanoidRootPart.Color = config.hitboxColor
-        humanoidRootPart.CastShadow = false -- Don't cast shadows
         
-        -- Add outline only if enabled in config (disable to see chat better)
-        if config.showOutline and not selectionBoxes[playerId] then
+        -- Add blue outline
+        if not selectionBoxes[playerId] then
             local selectionBox = Instance.new("SelectionBox")
             selectionBox.Adornee = humanoidRootPart
             selectionBox.Color3 = config.outlineColor
-            selectionBox.LineThickness = 0.01 -- Very thin line
-            selectionBox.Transparency = 0.8 -- Very transparent
+            selectionBox.LineThickness = 0.05
             selectionBox.Parent = humanoidRootPart
             selectionBoxes[playerId] = selectionBox
         end
