@@ -419,7 +419,19 @@ RunService.RenderStepped:Connect(function()
     local target = getMouseTarget()
     
     -- Check if we should shoot
-    if target and isEnemy(target) and isTargetVisible(target) then
+    -- If hitbox expander is enabled, skip wall check (expanded hitbox can be hit through walls)
+    local canShoot = false
+    if target and isEnemy(target) then
+        if hitboxEnabled then
+            -- Hitbox expander is on, shoot regardless of walls
+            canShoot = true
+        else
+            -- Hitbox expander is off, check for walls
+            canShoot = isTargetVisible(target)
+        end
+    end
+    
+    if canShoot then
         -- Check if weapon is automatic
         if isAutomaticWeapon(tool) then
             -- Hold trigger for automatic weapons
@@ -487,4 +499,6 @@ end)
 print("Hitbox Expander + Triggerbot loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
+
+
 
