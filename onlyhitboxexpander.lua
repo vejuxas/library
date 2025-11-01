@@ -15,12 +15,15 @@ local config = _G.hitboxConfig or {
     hitboxColor = Color3.fromRGB(1, 97, 121),
     outlineColor = Color3.fromRGB(255, 255, 255),
     hitboxKey = "T",
-    triggerKey = "Y"
+    triggerKey = "Y",
+    rapidFireKey = "P",
+    rapidFireRate = 0.05
 }
 
 -- Toggle states
 local hitboxEnabled = false
 local triggerEnabled = false
+local rapidFireEnabled = false
 
 -- Store original sizes
 local originalSizes = {}
@@ -30,6 +33,11 @@ local selectionBoxes = {}
 local lastTriggerTime = 0
 local triggerCooldown = 0  -- 1ms between shots (ultra fast)
 local isHoldingTrigger = false
+
+-- Rapid fire variables
+local rapidFireRate = config.rapidFireRate
+local isFiring = false
+local lastRapidShot = 0
 
 -- Automatic weapons that should hold instead of click
 local automaticWeapons = {
@@ -74,6 +82,18 @@ triggerButton.TextSize = 14
 triggerButton.Font = Enum.Font.GothamBold
 triggerButton.Parent = screenGui
 
+local rapidButton = Instance.new("TextButton")
+rapidButton.Size = UDim2.new(0, 120, 0, 40)
+rapidButton.Position = UDim2.new(1, -130, 0, 100)  -- Below trigger button, top right
+rapidButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+rapidButton.BorderSizePixel = 2
+rapidButton.BorderColor3 = Color3.fromRGB(255, 0, 0)
+rapidButton.Text = "Rapid: OFF"
+rapidButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+rapidButton.TextSize = 14
+rapidButton.Font = Enum.Font.GothamBold
+rapidButton.Parent = screenGui
+
 local corner1 = Instance.new("UICorner")
 corner1.CornerRadius = UDim.new(0, 6)
 corner1.Parent = hitboxButton
@@ -81,6 +101,10 @@ corner1.Parent = hitboxButton
 local corner2 = Instance.new("UICorner")
 corner2.CornerRadius = UDim.new(0, 6)
 corner2.Parent = triggerButton
+
+local corner3 = Instance.new("UICorner")
+corner3.CornerRadius = UDim.new(0, 6)
+corner3.Parent = rapidButton
 
 -- Function to expand hitbox
 local function expandPlayerHitbox(player)
@@ -372,9 +396,53 @@ local function toggleTrigger()
     end
 end
 
+-- Toggle rapid fire function
+local function toggleRapidFire()
+    rapidFireEnabled = not rapidFireEnabled
+    
+    if rapidFireEnabled then
+        rapidButton.Text = "Rapid: ON"
+        rapidButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        rapidButton.BorderColor3 = Color3.fromRGB(0, 255, 0)
+        print("Rapid Fire enabled!")
+    else
+        rapidButton.Text = "Rapid: OFF"
+        rapidButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        rapidButton.BorderColor3 = Color3.fromRGB(255, 0, 0)
+        isFiring = false
+        print("Rapid Fire disabled!")
+    end
+end
+
+-- Function to fire weapon rapidly
+local function fireWeaponRapid()
+    local currentTime = tick()
+    if currentTime - lastRapidShot < rapidFireRate then
+        return
+    end
+    lastRapidShot = currentTime
+    
+    local tool = getCurrentTool()
+    if not tool then return end
+    
+    -- Method 1: Find and fire RemoteEvent
+    pcall(function()
+        local remoteEvent = tool:FindFirstChild("RemoteEvent", true)
+        if remoteEvent and remoteEvent:IsA("RemoteEvent") then
+            remoteEvent:FireServer("Shoot")
+        end
+    end)
+    
+    -- Method 2: Activate tool
+    pcall(function()
+        tool:Activate()
+    end)
+end
+
 -- Button click handlers
 hitboxButton.MouseButton1Click:Connect(toggleHitbox)
 triggerButton.MouseButton1Click:Connect(toggleTrigger)
+rapidButton.MouseButton1Click:Connect(toggleRapidFire)
 
 -- Keyboard input handlers
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
@@ -384,7 +452,39 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         toggleHitbox()
     elseif input.KeyCode == Enum.KeyCode[config.triggerKey] then
         toggleTrigger()
+    elseif input.KeyCode == Enum.KeyCode[config.rapidFireKey] then
+        toggleRapidFire()
     end
+    
+    -- Rapid fire mouse input
+    if not gameProcessed and rapidFireEnabled and input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isFiring = true
+    end
+end)
+
+-- Mouse release handler for rapid fire
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isFiring = false
+        
+        -- Deactivate tool to stop shooting
+        local tool = getCurrentTool()
+        if tool then
+            pcall(function()
+                tool:Deactivate()
+            end)
+        end
+    end
+end)
+
+-- Rapid fire loop
+RunService.RenderStepped:Connect(function()
+    if not rapidFireEnabled or not isFiring then return end
+    
+    local tool = getCurrentTool()
+    if not tool then return end
+    
+    fireWeaponRapid()
 end)
 
 -- Keep hitboxes expanded when enabled
@@ -496,9 +596,8 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
-print("Hitbox Expander + Triggerbot loaded!")
+print("Hitbox Expander + Triggerbot + Rapid Fire loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
-
-
+print("Press " .. config.rapidFireKey .. " to toggle rapid fire")
 
