@@ -17,7 +17,9 @@ local config = _G.hitboxConfig or {
     hitboxKey = "T",
     triggerKey = "Y",
     rapidFireKey = "P",
-    rapidFireRate = 0.05
+    rapidFireRate = 0.05,
+    autoReload = true,
+    reloadAtAmmo = 0
 }
 
 -- Toggle states
@@ -38,6 +40,12 @@ local isHoldingTrigger = false
 local rapidFireRate = config.rapidFireRate
 local isFiring = false
 local lastRapidShot = 0
+
+-- Auto reload variables
+local autoReloadEnabled = config.autoReload
+local reloadAtAmmo = config.reloadAtAmmo
+local lastReload = 0
+local reloadCooldown = 0.5
 
 -- Automatic weapons that should hold instead of click
 local automaticWeapons = {
@@ -439,6 +447,61 @@ local function fireWeaponRapid()
     end)
 end
 
+-- Function to get ammo from tool
+local function getAmmo(tool)
+    if not tool then return nil, nil end
+    
+    -- Method 1: Check for Ammo IntValue
+    local ammo = tool:FindFirstChild("Ammo")
+    if ammo and ammo:IsA("IntValue") then
+        return ammo.Value, ammo
+    end
+    
+    -- Method 2: Check for Ammo NumberValue
+    if ammo and ammo:IsA("NumberValue") then
+        return ammo.Value, ammo
+    end
+    
+    -- Method 3: Check in tool's children recursively
+    for _, child in pairs(tool:GetDescendants()) do
+        if child.Name == "Ammo" and (child:IsA("IntValue") or child:IsA("NumberValue")) then
+            return child.Value, child
+        end
+    end
+    
+    return nil, nil
+end
+
+-- Function to reload weapon
+local function reloadWeapon()
+    local currentTime = tick()
+    if currentTime - lastReload < reloadCooldown then
+        return false
+    end
+    lastReload = currentTime
+    
+    local tool = getCurrentTool()
+    if not tool then return false end
+    
+    -- Method 1: Press R key
+    pcall(function()
+        local vim = game:GetService("VirtualInputManager")
+        vim:SendKeyEvent(true, Enum.KeyCode.R, false, game)
+        task.wait(0.05)
+        vim:SendKeyEvent(false, Enum.KeyCode.R, false, game)
+    end)
+    
+    -- Method 2: Fire reload remote if it exists
+    pcall(function()
+        local reloadRemote = tool:FindFirstChild("RemoteEvent", true)
+        if reloadRemote and reloadRemote:IsA("RemoteEvent") then
+            reloadRemote:FireServer("Reload")
+        end
+    end)
+    
+    return true
+end
+
 -- Button click handlers
 hitboxButton.MouseButton1Click:Connect(toggleHitbox)
 triggerButton.MouseButton1Click:Connect(toggleTrigger)
@@ -485,6 +548,21 @@ RunService.RenderStepped:Connect(function()
     if not tool then return end
     
     fireWeaponRapid()
+end)
+
+-- Auto reload loop
+RunService.RenderStepped:Connect(function()
+    if not autoReloadEnabled then return end
+    
+    local tool = getCurrentTool()
+    if not tool then return end
+    
+    local ammoValue, ammoObject = getAmmo(tool)
+    
+    -- Only reload when ammo is at or below the threshold
+    if ammoValue and ammoValue <= reloadAtAmmo then
+        reloadWeapon()
+    end
 end)
 
 -- Keep hitboxes expanded when enabled
@@ -596,8 +674,13 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
-print("Hitbox Expander + Triggerbot + Rapid Fire loaded!")
+print("Hitbox Expander + Triggerbot + Rapid Fire + Auto Reload loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
 print("Press " .. config.rapidFireKey .. " to toggle rapid fire")
+if autoReloadEnabled then
+    print("Auto Reload: ENABLED (reloads at " .. reloadAtAmmo .. " ammo)")
+else
+    print("Auto Reload: DISABLED")
+end
 
