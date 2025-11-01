@@ -29,6 +29,20 @@ local selectionBoxes = {}
 -- Triggerbot cooldown
 local lastTriggerTime = 0
 local triggerCooldown = 0  -- 1ms between shots (ultra fast)
+local isHoldingTrigger = false
+
+-- Automatic weapons that should hold instead of click
+local automaticWeapons = {
+    ["[SMG]"] = true,
+    ["[AR]"] = true,
+    ["[P90]"] = true,
+    ["[SilencerAR]"] = true,
+    ["[AK47]"] = true,
+    ["[Flamethrower]"] = true,
+    ["[AUG]"] = true,
+    ["[LMG]"] = true,
+    ["[Drum-Shotgun]"] = true
+}
 
 -- Create UI
 local screenGui = Instance.new("ScreenGui")
@@ -232,7 +246,60 @@ local function getCurrentTool()
     return nil
 end
 
--- Function to simulate click (multiple methods for compatibility)
+-- Function to check if weapon is automatic
+local function isAutomaticWeapon(tool)
+    if not tool then return false end
+    
+    for weaponName, _ in pairs(automaticWeapons) do
+        if tool:FindFirstChild(weaponName) or tool.Name == weaponName then
+            return true
+        end
+    end
+    
+    return false
+end
+
+-- Function to hold trigger (for automatic weapons)
+local function holdTrigger()
+    if isHoldingTrigger then return end
+    
+    isHoldingTrigger = true
+    local tool = getCurrentTool()
+    
+    if tool then
+        -- Activate and hold
+        pcall(function()
+            tool:Activate()
+        end)
+        
+        -- Hold mouse button
+        pcall(function()
+            mouse1press()
+        end)
+    end
+end
+
+-- Function to release trigger
+local function releaseTrigger()
+    if not isHoldingTrigger then return end
+    
+    isHoldingTrigger = false
+    local tool = getCurrentTool()
+    
+    if tool then
+        -- Deactivate
+        pcall(function()
+            tool:Deactivate()
+        end)
+        
+        -- Release mouse button
+        pcall(function()
+            mouse1release()
+        end)
+    end
+end
+
+-- Function to simulate click (for semi-automatic weapons)
 local function triggerClick()
     local currentTime = tick()
     if currentTime - lastTriggerTime < triggerCooldown then
@@ -297,6 +364,11 @@ local function toggleTrigger()
         triggerButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         triggerButton.BorderColor3 = Color3.fromRGB(255, 0, 0)
         print("Triggerbot disabled!")
+        
+        -- Release trigger if it was holding
+        if isHoldingTrigger then
+            releaseTrigger()
+        end
     end
 end
 
@@ -326,15 +398,41 @@ end)
 
 -- Triggerbot loop
 RunService.RenderStepped:Connect(function()
-    if not triggerEnabled then return end
+    if not triggerEnabled then
+        -- Release trigger if disabled
+        if isHoldingTrigger then
+            releaseTrigger()
+        end
+        return
+    end
     
     -- Check if player has a tool equipped
     local tool = getCurrentTool()
-    if not tool then return end
+    if not tool then
+        -- Release trigger if no tool
+        if isHoldingTrigger then
+            releaseTrigger()
+        end
+        return
+    end
     
     local target = getMouseTarget()
+    
+    -- Check if we should shoot
     if target and isEnemy(target) and isTargetVisible(target) then
-        triggerClick()
+        -- Check if weapon is automatic
+        if isAutomaticWeapon(tool) then
+            -- Hold trigger for automatic weapons
+            holdTrigger()
+        else
+            -- Click for semi-automatic weapons
+            triggerClick()
+        end
+    else
+        -- No valid target, release trigger if holding
+        if isHoldingTrigger then
+            releaseTrigger()
+        end
     end
 end)
 
