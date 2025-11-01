@@ -199,19 +199,35 @@ local function triggerClick()
     
     local tool = getCurrentTool()
     
-    -- Method 1: Try to find and fire RemoteEvent (for custom weapon systems)
+    -- Method 1: Try to find and fire RemoteEvent in weapon (for custom weapon systems)
     if tool then
+        local remoteFound = false
         pcall(function()
             -- Look for RemoteEvent in the weapon
             for _, descendant in pairs(tool:GetDescendants()) do
-                if descendant:IsA("RemoteEvent") and (descendant.Name:lower():find("fire") or descendant.Name:lower():find("shoot") or descendant.Name:lower():find("attack")) then
-                    descendant:FireServer()
-                    return
+                if descendant:IsA("RemoteEvent") then
+                    -- Try firing with "Shoot" parameter (common in Da Hood style games)
+                    pcall(function()
+                        descendant:FireServer("Shoot")
+                        remoteFound = true
+                    end)
+                    -- Also try firing without parameters
+                    if not remoteFound then
+                        pcall(function()
+                            descendant:FireServer()
+                            remoteFound = true
+                        end)
+                    end
+                    if remoteFound then
+                        return
+                    end
                 end
             end
             
-            -- Try to activate as regular tool
-            tool:Activate()
+            -- Try to activate as regular tool if no remote found
+            if not remoteFound then
+                tool:Activate()
+            end
         end)
     end
     
@@ -348,7 +364,4 @@ end)
 print("Hitbox Expander + Triggerbot loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
-
-
-
 
