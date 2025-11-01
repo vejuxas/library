@@ -5,8 +5,18 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local ChatService = game:GetService("Chat")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+
+-- Fix chat bubbles appearing behind/above hitbox by adjusting vertical offset
+pcall(function()
+    ChatService:SetBubbleChatSettings({
+        VerticalStudsOffset = 5,  -- Raises chat bubbles higher above characters
+        BubbleDuration = 15,
+        MaxDistance = 100
+    })
+end)
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -152,6 +162,7 @@ local function expandPlayerHitbox(player)
             highlight.FillTransparency = 1
             highlight.OutlineTransparency = 0
             highlight.OutlineColor = config.outlineColor
+            highlight.DepthMode = Enum.HighlightDepthMode.Occluded  -- Renders behind objects, keeps chat visible
             highlight.Parent = fakeHitbox
         end
     end
