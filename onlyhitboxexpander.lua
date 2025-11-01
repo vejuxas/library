@@ -197,25 +197,31 @@ local function triggerClick()
     end
     lastTriggerTime = currentTime
     
-    -- Method 1: Simulate mouse click (most reliable for Da Hood guns)
+    local tool = getCurrentTool()
+    
+    if tool then
+        -- Method 1: Find and fire the gun's RemoteEvent directly
+        local fired = false
+        pcall(function()
+            local remoteEvent = tool:FindFirstChild("RemoteEvent", true)
+            if remoteEvent and remoteEvent:IsA("RemoteEvent") then
+                remoteEvent:FireServer("Shoot")
+                fired = true
+            end
+        end)
+        
+        -- Method 2: Try to activate the tool directly
+        if not fired then
+            pcall(function()
+                tool:Activate()
+            end)
+        end
+    end
+    
+    -- Method 3: Mouse click as fallback
     pcall(function()
         mouse1click()
     end)
-    
-    -- Method 2: Also try mouse1press/release
-    pcall(function()
-        mouse1press()
-        wait(0.05)
-        mouse1release()
-    end)
-    
-    -- Method 3: Try Tool:Activate() for standard tools
-    local tool = getCurrentTool()
-    if tool then
-        pcall(function()
-            tool:Activate()
-        end)
-    end
 end
 
 -- Toggle hitbox function
