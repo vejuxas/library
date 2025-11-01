@@ -28,7 +28,7 @@ local selectionBoxes = {}
 
 -- Triggerbot cooldown
 local lastTriggerTime = 0
-local triggerCooldown = 0.1  -- 650ms between shots (matches Da Hood gun cooldown)
+local triggerCooldown = 0.01  -- 650ms between shots (matches Da Hood gun cooldown)
 
 -- Create UI
 local screenGui = Instance.new("ScreenGui")
@@ -346,5 +346,6 @@ end)
 print("Hitbox Expander + Triggerbot loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
+
 
 
