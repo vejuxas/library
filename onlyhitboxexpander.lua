@@ -130,20 +130,21 @@ local function expandPlayerHitbox(player)
         end
         
         humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
-        humanoidRootPart.Transparency = 1 -- Fully transparent so it doesn't block anything
+        humanoidRootPart.Transparency = 1
         humanoidRootPart.CanCollide = false
         humanoidRootPart.CanTouch = false
         humanoidRootPart.Material = Enum.Material.ForceField
         humanoidRootPart.Color = config.hitboxColor
         
-        -- Add blue outline
+        -- Use Highlight instead of SelectionBox (prevents chat UI interference)
         if not selectionBoxes[playerId] then
-            local selectionBox = Instance.new("SelectionBox")
-            selectionBox.Adornee = humanoidRootPart
-            selectionBox.Color3 = config.outlineColor
-            selectionBox.LineThickness = 0.05
-            selectionBox.Parent = humanoidRootPart
-            selectionBoxes[playerId] = selectionBox
+            local highlight = Instance.new("Highlight")
+            highlight.Adornee = humanoidRootPart
+            highlight.FillTransparency = 1 -- invisible inside
+            highlight.OutlineTransparency = 0
+            highlight.OutlineColor = config.outlineColor
+            highlight.Parent = humanoidRootPart
+            selectionBoxes[playerId] = highlight
         end
     end
 end
@@ -166,7 +167,6 @@ local function restorePlayerHitbox(player)
             humanoidRootPart.Material = Enum.Material.Plastic
         end
         
-        -- Remove outline
         if selectionBoxes[playerId] then
             selectionBoxes[playerId]:Destroy()
             selectionBoxes[playerId] = nil
@@ -683,4 +683,5 @@ if autoReloadEnabled then
 else
     print("Auto Reload: DISABLED")
 end
+
 
