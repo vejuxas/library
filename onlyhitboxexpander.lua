@@ -158,15 +158,31 @@ local function getMouseTarget()
     return nil
 end
 
--- Function to get current tool
+-- Weapon names from the game's system
+local weaponNames = {
+    "[Glock]", "[Silencer]", "[Shotgun]", "[Rifle]", "[SMG]", "[AR]",
+    "[RPG]", "[GrenadeLauncher]", "[P90]", "[SilencerAR]", "[Revolver]",
+    "[AK47]", "[TacticalShotgun]", "[DrumGun]", "[Flamethrower]",
+    "[AUG]", "[LMG]", "[Double-Barrel SG]", "[Drum-Shotgun]", "[Flintlock]"
+}
+
+-- Function to get current weapon (custom game system)
 local function getCurrentTool()
     local character = LocalPlayer.Character
     if not character then return nil end
     
-    -- Check for tool in character
+    -- Check for standard tool
     for _, child in pairs(character:GetChildren()) do
         if child:IsA("Tool") then
             return child
+        end
+    end
+    
+    -- Check for custom weapons (game-specific)
+    for _, weaponName in pairs(weaponNames) do
+        local weapon = character:FindFirstChild(weaponName)
+        if weapon then
+            return weapon
         end
     end
     
@@ -181,10 +197,20 @@ local function triggerClick()
     end
     lastTriggerTime = currentTime
     
-    -- Method 1: Try to activate equipped tool directly
     local tool = getCurrentTool()
+    
+    -- Method 1: Try to find and fire RemoteEvent (for custom weapon systems)
     if tool then
         pcall(function()
+            -- Look for RemoteEvent in the weapon
+            for _, descendant in pairs(tool:GetDescendants()) do
+                if descendant:IsA("RemoteEvent") and (descendant.Name:lower():find("fire") or descendant.Name:lower():find("shoot") or descendant.Name:lower():find("attack")) then
+                    descendant:FireServer()
+                    return
+                end
+            end
+            
+            -- Try to activate as regular tool
             tool:Activate()
         end)
     end
@@ -322,5 +348,7 @@ end)
 print("Hitbox Expander + Triggerbot loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
+
+
 
 
