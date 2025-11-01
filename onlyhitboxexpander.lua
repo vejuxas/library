@@ -28,7 +28,7 @@ local selectionBoxes = {}
 
 -- Triggerbot cooldown
 local lastTriggerTime = 0
-local triggerCooldown = 0  -- 650ms between shots (matches Da Hood gun cooldown)
+local triggerCooldown = 0  -- 1ms between shots (ultra fast)
 
 -- Create UI
 local screenGui = Instance.new("ScreenGui")
@@ -156,6 +156,49 @@ local function getMouseTarget()
     end
     
     return nil
+end
+
+-- Function to check if target is visible (not behind wall)
+local function isTargetVisible(target)
+    if not target then return false end
+    
+    local character = LocalPlayer.Character
+    if not character then return false end
+    
+    local head = character:FindFirstChild("Head")
+    if not head then return false end
+    
+    -- Create raycast parameters
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {character, workspace.Ignored}
+    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+    rayParams.IgnoreWater = true
+    
+    -- Get target position
+    local targetPos = target.Position
+    local origin = head.Position
+    local direction = (targetPos - origin)
+    
+    -- Perform raycast
+    local rayResult = workspace:Raycast(origin, direction, rayParams)
+    
+    -- Check if we hit the target or nothing (clear shot)
+    if not rayResult then
+        return true -- No obstruction
+    end
+    
+    -- Check if we hit the target player
+    if rayResult.Instance then
+        local hitParent = rayResult.Instance.Parent
+        if hitParent and hitParent:FindFirstChildOfClass("Humanoid") then
+            -- We hit a player, check if it's our target
+            if rayResult.Instance == target or hitParent == target.Parent then
+                return true
+            end
+        end
+    end
+    
+    return false -- Hit a wall or other obstacle
 end
 
 -- Weapon names from the game's system
@@ -290,7 +333,7 @@ RunService.RenderStepped:Connect(function()
     if not tool then return end
     
     local target = getMouseTarget()
-    if target and isEnemy(target) then
+    if target and isEnemy(target) and isTargetVisible(target) then
         triggerClick()
     end
 end)
@@ -346,7 +389,4 @@ end)
 print("Hitbox Expander + Triggerbot loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
-
-
-
 
