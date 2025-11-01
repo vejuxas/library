@@ -28,7 +28,7 @@ local selectionBoxes = {}
 
 -- Triggerbot cooldown
 local lastTriggerTime = 0
-local triggerCooldown = 0.1  -- 100ms between shots
+local triggerCooldown = 0.65  -- 650ms between shots (matches Da Hood gun cooldown)
 
 -- Create UI
 local screenGui = Instance.new("ScreenGui")
@@ -200,27 +200,24 @@ local function triggerClick()
     local tool = getCurrentTool()
     
     if tool then
-        -- Method 1: Find and fire the gun's RemoteEvent directly
-        local fired = false
+        -- Method 1: Properly activate the tool (triggers Tool.Activated event)
         pcall(function()
-            local remoteEvent = tool:FindFirstChild("RemoteEvent", true)
-            if remoteEvent and remoteEvent:IsA("RemoteEvent") then
-                remoteEvent:FireServer("Shoot")
-                fired = true
-            end
+            tool:Activate()
         end)
         
-        -- Method 2: Try to activate the tool directly
-        if not fired then
-            pcall(function()
-                tool:Activate()
-            end)
-        end
+        -- Wait a tiny bit then deactivate
+        task.wait(0.01)
+        
+        pcall(function()
+            tool:Deactivate()
+        end)
     end
     
-    -- Method 3: Mouse click as fallback
+    -- Method 2: Mouse simulation for games that need it
     pcall(function()
-        mouse1click()
+        mouse1press()
+        task.wait(0.01)
+        mouse1release()
     end)
 end
 
