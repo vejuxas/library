@@ -127,9 +127,9 @@ local function expandPlayerHitbox(player)
         local playerId = tostring(player.UserId)
 
         -- Create a separate fake hitbox part
-        local hitboxRef = character:FindFirstChild("ExpandedHitboxRef")
-        if not hitboxRef or not hitboxRef.Value then
-            local fakeHitbox = Instance.new("Part")
+        local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
+        if not fakeHitbox then
+            fakeHitbox = Instance.new("Part")
             fakeHitbox.Name = "ExpandedHitbox"
             fakeHitbox.Anchored = false
             fakeHitbox.CanCollide = false
@@ -139,19 +139,13 @@ local function expandPlayerHitbox(player)
             fakeHitbox.Material = Enum.Material.SmoothPlastic
             fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
             fakeHitbox.CFrame = humanoidRootPart.CFrame
-            fakeHitbox.Parent = workspace  -- Parent to workspace to not affect character bounding box
+            fakeHitbox.Parent = character
             
             -- Weld to follow the player
             local weld = Instance.new("WeldConstraint")
             weld.Part0 = humanoidRootPart
             weld.Part1 = fakeHitbox
             weld.Parent = fakeHitbox
-            
-            -- Store reference in character for cleanup
-            local refValue = Instance.new("ObjectValue")
-            refValue.Name = "ExpandedHitboxRef"
-            refValue.Value = fakeHitbox
-            refValue.Parent = character
 
             -- Highlight outline
             local highlight = Instance.new("Highlight")
@@ -173,10 +167,9 @@ local function restorePlayerHitbox(player)
     local character = player.Character
     if not character then return end
 
-    local hitboxRef = character:FindFirstChild("ExpandedHitboxRef")
-    if hitboxRef and hitboxRef.Value then
-        hitboxRef.Value:Destroy()
-        hitboxRef:Destroy()
+    local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
+    if fakeHitbox then
+        fakeHitbox:Destroy()
     end
 end
 
