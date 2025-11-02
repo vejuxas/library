@@ -125,39 +125,25 @@ local function expandPlayerHitbox(player)
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
         
-        -- Create a separate fake hitbox part that doesn't affect character bounding box
-        local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
-        if not fakeHitbox then
-            fakeHitbox = Instance.new("Part")
-            fakeHitbox.Name = "ExpandedHitbox"
-            fakeHitbox.Anchored = false
-            fakeHitbox.CanCollide = false
-            fakeHitbox.CanTouch = false
-            fakeHitbox.Massless = true
-            fakeHitbox.Transparency = 0.7
-            fakeHitbox.Material = Enum.Material.SmoothPlastic
-            fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
-            fakeHitbox.CFrame = humanoidRootPart.CFrame
-            fakeHitbox.Color = config.hitboxColor
-            
-            -- Critical: Parent to the HumanoidRootPart, not character
-            fakeHitbox.Parent = humanoidRootPart
-            
-            -- Weld to follow the player
-            local weld = Instance.new("WeldConstraint")
-            weld.Part0 = humanoidRootPart
-            weld.Part1 = fakeHitbox
-            weld.Parent = fakeHitbox
-            
-            -- Add outline
+        if not originalSizes[playerId] then
+            originalSizes[playerId] = humanoidRootPart.Size
+        end
+        
+        humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
+        humanoidRootPart.Transparency = 1
+        humanoidRootPart.CanCollide = false
+        humanoidRootPart.CanTouch = false
+        humanoidRootPart.Material = Enum.Material.ForceField
+        humanoidRootPart.Color = config.hitboxColor
+        
+        -- Use Highlight instead of SelectionBox (prevents chat UI interference)
+        if not selectionBoxes[playerId] then
             local highlight = Instance.new("Highlight")
-            highlight.Adornee = fakeHitbox
-            highlight.FillTransparency = 1
+            highlight.Adornee = humanoidRootPart
+            highlight.FillTransparency = 1 -- invisible inside
             highlight.OutlineTransparency = 0
             highlight.OutlineColor = config.outlineColor
-            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            highlight.Parent = fakeHitbox
-            
+            highlight.Parent = humanoidRootPart
             selectionBoxes[playerId] = highlight
         end
     end
@@ -170,15 +156,21 @@ local function restorePlayerHitbox(player)
     local character = player.Character
     if not character then return end
     
-    local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
-    if fakeHitbox then
-        fakeHitbox:Destroy()
-    end
-    
-    local playerId = tostring(player.UserId)
-    if selectionBoxes[playerId] then
-        selectionBoxes[playerId]:Destroy()
-        selectionBoxes[playerId] = nil
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        local playerId = tostring(player.UserId)
+        
+        if originalSizes[playerId] then
+            humanoidRootPart.Size = originalSizes[playerId]
+            humanoidRootPart.Transparency = 1
+            humanoidRootPart.CanCollide = false
+            humanoidRootPart.Material = Enum.Material.Plastic
+        end
+        
+        if selectionBoxes[playerId] then
+            selectionBoxes[playerId]:Destroy()
+            selectionBoxes[playerId] = nil
+        end
     end
 end
 
