@@ -5,32 +5,9 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local ChatService = game:GetService("Chat")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- Fix chat bubbles appearing behind/above hitbox by adjusting vertical offset
-pcall(function()
-    ChatService:SetBubbleChatSettings({
-        VerticalStudsOffset = 0,  -- Normal height
-        BubbleDuration = 15,
-        MaxDistance = 100,
-        AdorneeName = "Head"  -- Force chat bubbles to attach to head, not bounding box
-    })
-end)
-
--- Function to create chat attachment on character head
-local function createChatAttachment(character)
-    pcall(function()
-        local head = character:WaitForChild("Head", 5)
-        if head and not head:FindFirstChild("ChatAttachment") then
-            local attachment = Instance.new("Attachment")
-            attachment.Name = "ChatAttachment"
-            attachment.Position = Vector3.new(0, 0.5, 0)  -- Slightly above head
-            attachment.Parent = head
-        end
-    end)
-end
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -150,9 +127,9 @@ local function expandPlayerHitbox(player)
         local playerId = tostring(player.UserId)
 
         -- Create a separate fake hitbox part
-        local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
-        if not fakeHitbox then
-            fakeHitbox = Instance.new("Part")
+        local hitboxRef = character:FindFirstChild("ExpandedHitboxRef")
+        if not hitboxRef or not hitboxRef.Value then
+            local fakeHitbox = Instance.new("Part")
             fakeHitbox.Name = "ExpandedHitbox"
             fakeHitbox.Anchored = false
             fakeHitbox.CanCollide = false
@@ -162,13 +139,19 @@ local function expandPlayerHitbox(player)
             fakeHitbox.Material = Enum.Material.SmoothPlastic
             fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
             fakeHitbox.CFrame = humanoidRootPart.CFrame
-            fakeHitbox.Parent = character  -- Parent to character, not HumanoidRootPart, to avoid bounding box issues
+            fakeHitbox.Parent = workspace  -- Parent to workspace to not affect character bounding box
             
             -- Weld to follow the player
             local weld = Instance.new("WeldConstraint")
             weld.Part0 = humanoidRootPart
             weld.Part1 = fakeHitbox
             weld.Parent = fakeHitbox
+            
+            -- Store reference in character for cleanup
+            local refValue = Instance.new("ObjectValue")
+            refValue.Name = "ExpandedHitboxRef"
+            refValue.Value = fakeHitbox
+            refValue.Parent = character
 
             -- Highlight outline
             local highlight = Instance.new("Highlight")
@@ -190,9 +173,10 @@ local function restorePlayerHitbox(player)
     local character = player.Character
     if not character then return end
 
-    local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
-    if fakeHitbox then
-        fakeHitbox:Destroy()
+    local hitboxRef = character:FindFirstChild("ExpandedHitboxRef")
+    if hitboxRef and hitboxRef.Value then
+        hitboxRef.Value:Destroy()
+        hitboxRef:Destroy()
     end
 end
 
@@ -670,7 +654,6 @@ end)
 Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function(character)
         wait(0.5)
-        createChatAttachment(character)
         if hitboxEnabled then
             expandPlayerHitbox(player)
         end
@@ -681,15 +664,10 @@ end)
 for _, player in pairs(Players:GetPlayers()) do
     player.CharacterAdded:Connect(function(character)
         wait(0.5)
-        createChatAttachment(character)
         if hitboxEnabled then
             expandPlayerHitbox(player)
         end
     end)
-    -- Create chat attachment for already loaded characters
-    if player.Character then
-        createChatAttachment(player.Character)
-    end
 end
 
 -- Clean up when players leave
