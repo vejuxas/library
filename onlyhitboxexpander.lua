@@ -8,7 +8,6 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
-
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
     hitboxSize = 25,
@@ -125,37 +124,28 @@ local function expandPlayerHitbox(player)
     local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
-
-        -- Create a separate fake hitbox part
-        local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
-        if not fakeHitbox then
-            fakeHitbox = Instance.new("Part")
-            fakeHitbox.Name = "ExpandedHitbox"
-            fakeHitbox.Anchored = false
-            fakeHitbox.CanCollide = false
-            fakeHitbox.CanTouch = false
-            fakeHitbox.Massless = true
-            fakeHitbox.Transparency = 1
-            fakeHitbox.Material = Enum.Material.SmoothPlastic
-            fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
-            fakeHitbox.CFrame = humanoidRootPart.CFrame
-            fakeHitbox.Parent = character
-            
-            -- Weld to follow the player
-            local weld = Instance.new("WeldConstraint")
-            weld.Part0 = humanoidRootPart
-            weld.Part1 = fakeHitbox
-            weld.Parent = fakeHitbox
-
-            -- Highlight outline
+        
+        if not originalSizes[playerId] then
+            originalSizes[playerId] = humanoidRootPart.Size
+        end
+        
+        humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
+        humanoidRootPart.Transparency = 1
+        humanoidRootPart.CanCollide = false
+        humanoidRootPart.CanTouch = false
+        humanoidRootPart.Material = Enum.Material.SmoothPlastic
+        humanoidRootPart.Color = config.hitboxColor
+        
+        -- Use Highlight with AlwaysOnTop to prevent chat UI interference
+        if not selectionBoxes[playerId] then
             local highlight = Instance.new("Highlight")
-            highlight.Name = "ExpandedHighlight"
-            highlight.Adornee = fakeHitbox
-            highlight.FillTransparency = 1
+            highlight.Adornee = humanoidRootPart
+            highlight.FillTransparency = 1 -- invisible inside
             highlight.OutlineTransparency = 0
             highlight.OutlineColor = config.outlineColor
-            highlight.DepthMode = Enum.HighlightDepthMode.Occluded  -- Renders behind objects, keeps chat visible
-            highlight.Parent = fakeHitbox
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = humanoidRootPart
+            selectionBoxes[playerId] = highlight
         end
     end
 end
@@ -166,10 +156,22 @@ local function restorePlayerHitbox(player)
     
     local character = player.Character
     if not character then return end
-
-    local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
-    if fakeHitbox then
-        fakeHitbox:Destroy()
+    
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        local playerId = tostring(player.UserId)
+        
+        if originalSizes[playerId] then
+            humanoidRootPart.Size = originalSizes[playerId]
+            humanoidRootPart.Transparency = 1
+            humanoidRootPart.CanCollide = false
+            humanoidRootPart.Material = Enum.Material.Plastic
+        end
+        
+        if selectionBoxes[playerId] then
+            selectionBoxes[playerId]:Destroy()
+            selectionBoxes[playerId] = nil
+        end
     end
 end
 
@@ -645,7 +647,7 @@ end)
 
 -- Handle new players joining
 Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
+    player.CharacterAdded:Connect(function()
         wait(0.5)
         if hitboxEnabled then
             expandPlayerHitbox(player)
@@ -655,7 +657,7 @@ end)
 
 -- Handle player respawning
 for _, player in pairs(Players:GetPlayers()) do
-    player.CharacterAdded:Connect(function(character)
+    player.CharacterAdded:Connect(function()
         wait(0.5)
         if hitboxEnabled then
             expandPlayerHitbox(player)
@@ -682,4 +684,3 @@ if autoReloadEnabled then
 else
     print("Auto Reload: DISABLED")
 end
-
