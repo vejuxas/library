@@ -133,7 +133,7 @@ local function expandPlayerHitbox(player)
         humanoidRootPart.Transparency = 1
         humanoidRootPart.CanCollide = false
         humanoidRootPart.CanTouch = false
-        humanoidRootPart.Material = Enum.Material.ForceField
+        humanoidRootPart.Material = Enum.Material.SmoothPlastic
         humanoidRootPart.Color = config.hitboxColor
         
         -- Use Highlight instead of SelectionBox (prevents chat UI interference)
