@@ -5,8 +5,32 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local ChatService = game:GetService("Chat")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+
+-- Fix chat bubbles appearing behind/above hitbox by adjusting vertical offset
+pcall(function()
+    ChatService:SetBubbleChatSettings({
+        VerticalStudsOffset = 0,  -- Normal height
+        BubbleDuration = 15,
+        MaxDistance = 100,
+        AdorneeName = "Head"  -- Force chat bubbles to attach to head, not bounding box
+    })
+end)
+
+-- Function to create chat attachment on character head
+local function createChatAttachment(character)
+    pcall(function()
+        local head = character:WaitForChild("Head", 5)
+        if head and not head:FindFirstChild("ChatAttachment") then
+            local attachment = Instance.new("Attachment")
+            attachment.Name = "ChatAttachment"
+            attachment.Position = Vector3.new(0, 0.5, 0)  -- Slightly above head
+            attachment.Parent = head
+        end
+    end)
+end
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -124,27 +148,37 @@ local function expandPlayerHitbox(player)
     local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
-        
-        if not originalSizes[playerId] then
-            originalSizes[playerId] = humanoidRootPart.Size
-        end
-        
-        humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
-        humanoidRootPart.Transparency = 1
-        humanoidRootPart.CanCollide = false
-        humanoidRootPart.CanTouch = false
-        humanoidRootPart.Material = Enum.Material.ForceField
-        humanoidRootPart.Color = config.hitboxColor
-        
-        -- Use Highlight instead of SelectionBox (prevents chat UI interference)
-        if not selectionBoxes[playerId] then
+
+        -- Create a separate fake hitbox part
+        local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
+        if not fakeHitbox then
+            fakeHitbox = Instance.new("Part")
+            fakeHitbox.Name = "ExpandedHitbox"
+            fakeHitbox.Anchored = false
+            fakeHitbox.CanCollide = false
+            fakeHitbox.CanTouch = false
+            fakeHitbox.Massless = true
+            fakeHitbox.Transparency = 1
+            fakeHitbox.Material = Enum.Material.SmoothPlastic
+            fakeHitbox.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
+            fakeHitbox.CFrame = humanoidRootPart.CFrame
+            fakeHitbox.Parent = character  -- Parent to character, not HumanoidRootPart, to avoid bounding box issues
+            
+            -- Weld to follow the player
+            local weld = Instance.new("WeldConstraint")
+            weld.Part0 = humanoidRootPart
+            weld.Part1 = fakeHitbox
+            weld.Parent = fakeHitbox
+
+            -- Highlight outline
             local highlight = Instance.new("Highlight")
-            highlight.Adornee = humanoidRootPart
-            highlight.FillTransparency = 1 -- invisible inside
+            highlight.Name = "ExpandedHighlight"
+            highlight.Adornee = fakeHitbox
+            highlight.FillTransparency = 1
             highlight.OutlineTransparency = 0
             highlight.OutlineColor = config.outlineColor
-            highlight.Parent = humanoidRootPart
-            selectionBoxes[playerId] = highlight
+            highlight.DepthMode = Enum.HighlightDepthMode.Occluded  -- Renders behind objects, keeps chat visible
+            highlight.Parent = fakeHitbox
         end
     end
 end
@@ -155,22 +189,10 @@ local function restorePlayerHitbox(player)
     
     local character = player.Character
     if not character then return end
-    
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if humanoidRootPart then
-        local playerId = tostring(player.UserId)
-        
-        if originalSizes[playerId] then
-            humanoidRootPart.Size = originalSizes[playerId]
-            humanoidRootPart.Transparency = 1
-            humanoidRootPart.CanCollide = false
-            humanoidRootPart.Material = Enum.Material.Plastic
-        end
-        
-        if selectionBoxes[playerId] then
-            selectionBoxes[playerId]:Destroy()
-            selectionBoxes[playerId] = nil
-        end
+
+    local fakeHitbox = character:FindFirstChild("ExpandedHitbox")
+    if fakeHitbox then
+        fakeHitbox:Destroy()
     end
 end
 
@@ -646,8 +668,9 @@ end)
 
 -- Handle new players joining
 Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
+    player.CharacterAdded:Connect(function(character)
         wait(0.5)
+        createChatAttachment(character)
         if hitboxEnabled then
             expandPlayerHitbox(player)
         end
@@ -656,12 +679,17 @@ end)
 
 -- Handle player respawning
 for _, player in pairs(Players:GetPlayers()) do
-    player.CharacterAdded:Connect(function()
+    player.CharacterAdded:Connect(function(character)
         wait(0.5)
+        createChatAttachment(character)
         if hitboxEnabled then
             expandPlayerHitbox(player)
         end
     end)
+    -- Create chat attachment for already loaded characters
+    if player.Character then
+        createChatAttachment(player.Character)
+    end
 end
 
 -- Clean up when players leave
@@ -683,3 +711,4 @@ if autoReloadEnabled then
 else
     print("Auto Reload: DISABLED")
 end
+
