@@ -5,8 +5,21 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Chat = game:GetService("Chat")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+
+-- Fix chat bubble positioning
+pcall(function()
+    Chat:SetBubbleChatSettings({
+        TailVisible = true,
+        BubbleDuration = 15,
+        BubblesSpacing = 6,
+        MaxDistance = 100,
+        MinimizeDistance = 40,
+        VerticalStudsOffset = 0
+    })
+end)
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -122,6 +135,7 @@ local function expandPlayerHitbox(player)
     if not character then return end
     
     local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    local head = character:FindFirstChild("Head")
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
         
@@ -133,8 +147,16 @@ local function expandPlayerHitbox(player)
         humanoidRootPart.Transparency = 1
         humanoidRootPart.CanCollide = false
         humanoidRootPart.CanTouch = false
-        humanoidRootPart.Material = Enum.Material.SmoothPlastic
+        humanoidRootPart.Material = Enum.Material.ForceField
         humanoidRootPart.Color = config.hitboxColor
+        
+        -- Fix chat bubbles by creating attachment on head
+        if head and not head:FindFirstChild("ChatOrigin") then
+            local attachment = Instance.new("Attachment")
+            attachment.Name = "ChatOrigin"
+            attachment.Position = Vector3.new(0, 0, 0)
+            attachment.Parent = head
+        end
         
         -- Use Highlight instead of SelectionBox (prevents chat UI interference)
         if not selectionBoxes[playerId] then
