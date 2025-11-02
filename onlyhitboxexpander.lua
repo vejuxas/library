@@ -5,21 +5,9 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local Chat = game:GetService("Chat")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- Fix chat bubble positioning
-pcall(function()
-    Chat:SetBubbleChatSettings({
-        TailVisible = true,
-        BubbleDuration = 15,
-        BubblesSpacing = 6,
-        MaxDistance = 100,
-        MinimizeDistance = 40,
-        VerticalStudsOffset = 0
-    })
-end)
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -135,38 +123,43 @@ local function expandPlayerHitbox(player)
     if not character then return end
     
     local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    local head = character:FindFirstChild("Head")
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
         
-        if not originalSizes[playerId] then
-            originalSizes[playerId] = humanoidRootPart.Size
-        end
-        
-        humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
-        humanoidRootPart.Transparency = 1
-        humanoidRootPart.CanCollide = false
-        humanoidRootPart.CanTouch = false
-        humanoidRootPart.Material = Enum.Material.ForceField
-        humanoidRootPart.Color = config.hitboxColor
-        
-        -- Fix chat bubbles by creating attachment on head
-        if head and not head:FindFirstChild("ChatOrigin") then
-            local attachment = Instance.new("Attachment")
-            attachment.Name = "ChatOrigin"
-            attachment.Position = Vector3.new(0, 0, 0)
-            attachment.Parent = head
-        end
-        
-        -- Use Highlight instead of SelectionBox (prevents chat UI interference)
-        if not selectionBoxes[playerId] then
-            local highlight = Instance.new("Highlight")
-            highlight.Adornee = humanoidRootPart
-            highlight.FillTransparency = 1 -- invisible inside
-            highlight.OutlineTransparency = 0
-            highlight.OutlineColor = config.outlineColor
-            highlight.Parent = humanoidRootPart
-            selectionBoxes[playerId] = highlight
+        -- Don't modify HumanoidRootPart size, create invisible hitbox parts instead
+        if not character:FindFirstChild("Hitbox_Head") then
+            -- Create multiple small hitbox parts that cover the area
+            local parts = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"}
+            
+            for _, partName in ipairs(parts) do
+                local bodyPart = character:FindFirstChild(partName) or humanoidRootPart
+                local hitboxPart = Instance.new("Part")
+                hitboxPart.Name = "Hitbox_" .. partName
+                hitboxPart.Size = Vector3.new(config.hitboxSize/2, config.hitboxSize/2, config.hitboxSize/2)
+                hitboxPart.Transparency = 1
+                hitboxPart.CanCollide = false
+                hitboxPart.Massless = true
+                hitboxPart.Material = Enum.Material.ForceField
+                hitboxPart.Color = config.hitboxColor
+                hitboxPart.CFrame = bodyPart.CFrame
+                hitboxPart.Parent = character
+                
+                local weld = Instance.new("WeldConstraint")
+                weld.Part0 = bodyPart
+                weld.Part1 = hitboxPart
+                weld.Parent = hitboxPart
+            end
+            
+            -- Add outline to HumanoidRootPart only for visibility
+            if not selectionBoxes[playerId] then
+                local highlight = Instance.new("Highlight")
+                highlight.Adornee = humanoidRootPart
+                highlight.FillTransparency = 1
+                highlight.OutlineTransparency = 0
+                highlight.OutlineColor = config.outlineColor
+                highlight.Parent = humanoidRootPart
+                selectionBoxes[playerId] = highlight
+            end
         end
     end
 end
@@ -178,21 +171,18 @@ local function restorePlayerHitbox(player)
     local character = player.Character
     if not character then return end
     
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if humanoidRootPart then
-        local playerId = tostring(player.UserId)
-        
-        if originalSizes[playerId] then
-            humanoidRootPart.Size = originalSizes[playerId]
-            humanoidRootPart.Transparency = 1
-            humanoidRootPart.CanCollide = false
-            humanoidRootPart.Material = Enum.Material.Plastic
+    -- Remove all hitbox parts
+    for _, child in pairs(character:GetChildren()) do
+        if child.Name:match("^Hitbox_") then
+            child:Destroy()
         end
-        
-        if selectionBoxes[playerId] then
-            selectionBoxes[playerId]:Destroy()
-            selectionBoxes[playerId] = nil
-        end
+    end
+    
+    -- Remove highlight
+    local playerId = tostring(player.UserId)
+    if selectionBoxes[playerId] then
+        selectionBoxes[playerId]:Destroy()
+        selectionBoxes[playerId] = nil
     end
 end
 
