@@ -8,7 +8,6 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
-
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
     hitboxSize = 25,
@@ -126,40 +125,26 @@ local function expandPlayerHitbox(player)
     if humanoidRootPart then
         local playerId = tostring(player.UserId)
         
-        -- Don't modify HumanoidRootPart size, create invisible hitbox parts instead
-        if not character:FindFirstChild("Hitbox_Head") then
-            -- Create multiple small hitbox parts that cover the area
-            local parts = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"}
-            
-            for _, partName in ipairs(parts) do
-                local bodyPart = character:FindFirstChild(partName) or humanoidRootPart
-                local hitboxPart = Instance.new("Part")
-                hitboxPart.Name = "Hitbox_" .. partName
-                hitboxPart.Size = Vector3.new(config.hitboxSize/2, config.hitboxSize/2, config.hitboxSize/2)
-                hitboxPart.Transparency = 1
-                hitboxPart.CanCollide = false
-                hitboxPart.Massless = true
-                hitboxPart.Material = Enum.Material.ForceField
-                hitboxPart.Color = config.hitboxColor
-                hitboxPart.CFrame = bodyPart.CFrame
-                hitboxPart.Parent = character
-                
-                local weld = Instance.new("WeldConstraint")
-                weld.Part0 = bodyPart
-                weld.Part1 = hitboxPart
-                weld.Parent = hitboxPart
-            end
-            
-            -- Add outline to HumanoidRootPart only for visibility
-            if not selectionBoxes[playerId] then
-                local highlight = Instance.new("Highlight")
-                highlight.Adornee = humanoidRootPart
-                highlight.FillTransparency = 1
-                highlight.OutlineTransparency = 0
-                highlight.OutlineColor = config.outlineColor
-                highlight.Parent = humanoidRootPart
-                selectionBoxes[playerId] = highlight
-            end
+        if not originalSizes[playerId] then
+            originalSizes[playerId] = humanoidRootPart.Size
+        end
+        
+        humanoidRootPart.Size = Vector3.new(config.hitboxSize, config.hitboxSize, config.hitboxSize)
+        humanoidRootPart.Transparency = 1
+        humanoidRootPart.CanCollide = false
+        humanoidRootPart.CanTouch = false
+        humanoidRootPart.Material = Enum.Material.ForceField
+        humanoidRootPart.Color = config.hitboxColor
+        
+        -- Use Highlight instead of SelectionBox (prevents chat UI interference)
+        if not selectionBoxes[playerId] then
+            local highlight = Instance.new("Highlight")
+            highlight.Adornee = humanoidRootPart
+            highlight.FillTransparency = 1 -- invisible inside
+            highlight.OutlineTransparency = 0
+            highlight.OutlineColor = config.outlineColor
+            highlight.Parent = humanoidRootPart
+            selectionBoxes[playerId] = highlight
         end
     end
 end
@@ -171,18 +156,21 @@ local function restorePlayerHitbox(player)
     local character = player.Character
     if not character then return end
     
-    -- Remove all hitbox parts
-    for _, child in pairs(character:GetChildren()) do
-        if child.Name:match("^Hitbox_") then
-            child:Destroy()
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        local playerId = tostring(player.UserId)
+        
+        if originalSizes[playerId] then
+            humanoidRootPart.Size = originalSizes[playerId]
+            humanoidRootPart.Transparency = 1
+            humanoidRootPart.CanCollide = false
+            humanoidRootPart.Material = Enum.Material.Plastic
         end
-    end
-    
-    -- Remove highlight
-    local playerId = tostring(player.UserId)
-    if selectionBoxes[playerId] then
-        selectionBoxes[playerId]:Destroy()
-        selectionBoxes[playerId] = nil
+        
+        if selectionBoxes[playerId] then
+            selectionBoxes[playerId]:Destroy()
+            selectionBoxes[playerId] = nil
+        end
     end
 end
 
@@ -697,3 +685,4 @@ else
 end
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/vejuxas/hitbox-expander/refs/heads/main/aaaa"))()
+
