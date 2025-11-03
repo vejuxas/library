@@ -1,12 +1,15 @@
--- Instant Hitbox Expander with Toggle + Triggerbot
+-- Instant Hitbox Expander with Toggle + Triggerbot + Silent Aim
 -- Press T or click button to toggle hitbox
 -- Press Y or click button to toggle triggerbot
+-- Silent Aim automatically enabled if configured
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+local Camera = workspace.CurrentCamera
 
 -- Configuration (reads from _G.hitboxConfig or uses defaults)
 local config = _G.hitboxConfig or {
@@ -19,13 +22,20 @@ local config = _G.hitboxConfig or {
     rapidFireKey = "P",
     rapidFireRate = 0.05,
     autoReload = true,
-    reloadAtAmmo = 0
+    reloadAtAmmo = 0,
+    silentAim = true,
+    autoShoot = false,
+    hitPart = "Head",
+    maxDistance = 200,
+    allowKnocked = false
 }
 
 -- Toggle states
 local hitboxEnabled = false
 local triggerEnabled = false
 local rapidFireEnabled = false
+local silentAimEnabled = config.silentAim
+local autoShootEnabled = config.autoShoot
 
 -- Store original sizes
 local originalSizes = {}
@@ -47,6 +57,55 @@ local reloadAtAmmo = config.reloadAtAmmo
 local lastReload = 0
 local reloadCooldown = 0.5
 
+-- Silent Aim variables
+local LastPart, LastPlayer
+local MainEvent = ReplicatedStorage:FindFirstChild("MainEvent")
+
+-- Raycast parameters for Silent Aim
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Root = Character:WaitForChild("HumanoidRootPart")
+
+local Params = RaycastParams.new()
+Params.FilterDescendantsInstances = {Character, workspace:FindFirstChild("Vehicles")}
+Params.FilterType = Enum.RaycastFilterType.Blacklist
+
+-- Function to check if player is knocked out
+local function IsKOED(Char)
+    local Effects = Char and Char:FindFirstChild("BodyEffects")
+    if not Effects then return true end
+    local KO, Dead = Effects:FindFirstChild("K.O"), Effects:FindFirstChild("Dead")
+    return KO and KO.Value or Dead and Dead.Value
+end
+
+-- Function to get closest player for Silent Aim
+local function GetClosestPlayerSilentAim(Position, MaxDistance)
+    local ClosestPart, ClosestPlayer, FinalRay
+    local ClosestDistance = MaxDistance or config.maxDistance
+    
+    local PlayersList = Players:GetPlayers()
+    table.remove(PlayersList, table.find(PlayersList, LocalPlayer))
+    
+    for _, Player in pairs(PlayersList) do
+        local Char = Player.Character
+        local Part = Char and Char:FindFirstChild(config.hitPart)
+        
+        if not Part or (not config.allowKnocked and IsKOED(Char)) then continue end
+        
+        local Direction = (Part.Position - Position)
+        local Distance = Direction.magnitude
+        
+        if ClosestDistance > Distance then
+            local ray = workspace:Raycast(Position, Direction.Unit * Direction.Magnitude, Params)
+            
+            if ray and ray.Instance:IsDescendantOf(Char) then
+                ClosestPart, ClosestPlayer, ClosestDistance, FinalRay = Part, Player, Distance, ray
+            end
+        end
+    end
+    
+    return ClosestPart, ClosestPlayer, FinalRay
+end
+
 -- Automatic weapons that should hold instead of click
 local automaticWeapons = {
     ["[SMG]"] = true,
@@ -59,6 +118,84 @@ local automaticWeapons = {
     ["[LMG]"] = true,
     ["[Drum-Shotgun]"] = true
 }
+
+-- Function to get the closest part for Silent Aim (caches last target)
+local function GetClosestPart(MHit)
+    local Hit = MHit.Position
+    if LastPart then
+        local Ray = workspace:Raycast(Hit, (Hit - LastPart.Position).Unit * 200, Params)
+        if not Ray or not Ray.Instance:IsDescendantOf(LastPart.Parent) or (LastPlayer and not config.allowKnocked and IsKOED(LastPlayer.Character)) then
+            LastPart = nil
+        end
+    end
+    
+    if not LastPart then
+        LastPart, LastPlayer = GetClosestPlayerSilentAim(Hit)
+    end
+    
+    return LastPart
+end
+
+-- Silent Aim metamethod hooks
+local OriginalIndex, OriginalNewIndex, OriginalNamecall
+local Getmetatable = getmetatable
+
+local function IsTrap(a)
+    local mt = typeof(a) == "table" and Getmetatable(a)
+    return mt and mt.__tostring
+end
+
+if silentAimEnabled then
+    OriginalIndex = hookmetamethod(game, "__index", newcclosure(function(Self, Key)
+        local Hit = OriginalIndex(Self, Key)
+        
+        if Self == game and (not Key or IsTrap(Key)) then return error("missing argument #2 (string expected)") end
+        if not Self then error("invalid argument #1 (Instance expected, got nil)") end
+        if not Key then error("invalid argument #2 (string expected, got nil)") end
+        
+        if not getCurrentTool() or Self ~= Mouse or not silentAimEnabled then return Hit end
+        
+        if Key == "Hit" then
+            local TargetPart = GetClosestPart(Hit)
+            
+            if TargetPart then
+                return TargetPart.CFrame
+            end
+        elseif Key == "Target" then
+            return LastPart or GetClosestPart(OriginalIndex(Self, "Hit"))
+        end
+        
+        return Hit
+    end))
+    
+    OriginalNewIndex = hookmetamethod(game, "__newindex", newcclosure(function(Self, Key, Value)
+        if Self == game and (not Key and not Value or IsTrap(Key)) then return error("missing argument #2 (string expected)") end
+        if not Self then error("invalid argument #1 (Instance expected, got nil)") end
+        if not Key then error("invalid argument #2 (string expected, got nil)") end
+        
+        local src = getcallingscript()
+        local IsAC = src and not src.Parent and src.Name ~= "ChatMain" and src.Name ~= "CameraModule" and src.Name ~= "ControlModule" and not checkcaller()
+        
+        if IsAC then return end
+        
+        return OriginalNewIndex(Self, Key, Value)
+    end))
+    
+    OriginalNamecall = hookmetamethod(game, "__namecall", newcclosure(function(Self, ...)
+        local Method = getnamecallmethod()
+        if Self == game and (not Method or IsTrap(...)) then return error("Trying to call Method on object of type: DataModel with incorrect arguments.") end
+        
+        local src = getcallingscript()
+        local IsAC = src and not src.Parent and src.Name ~= "ChatMain" and src.Name ~= "CameraModule" and not checkcaller()
+        
+        if IsAC then
+            if Method == "FindService" then return end
+            if not Method then error("invalid argument #1 (Instance expected, got nil)") end
+        end
+        
+        return OriginalNamecall(Self, ...)
+    end))
+end
 
 -- Create UI
 local screenGui = Instance.new("ScreenGui")
@@ -674,7 +811,35 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
-print("Hitbox Expander + Triggerbot + Rapid Fire + Auto Reload loaded!")
+-- Auto Shoot loop (Silent Aim)
+RunService.RenderStepped:Connect(function()
+    if not autoShootEnabled or not silentAimEnabled then return end
+    
+    local tool = getCurrentTool()
+    if not tool then return end
+    
+    local targetPart = GetClosestPart(Mouse.Hit)
+    
+    if targetPart then
+        -- Shoot at the target
+        pcall(function()
+            tool:Activate()
+        end)
+        
+        pcall(function()
+            mouse1click()
+        end)
+    end
+end)
+
+-- Update character on respawn
+LocalPlayer.CharacterAdded:Connect(function(NewChar)
+    Character = NewChar
+    Root = Character:WaitForChild("HumanoidRootPart")
+    Params.FilterDescendantsInstances = {Character, workspace:FindFirstChild("Vehicles")}
+end)
+
+print("Hitbox Expander + Triggerbot + Rapid Fire + Auto Reload + Silent Aim loaded!")
 print("Press " .. config.hitboxKey .. " to toggle hitbox")
 print("Press " .. config.triggerKey .. " to toggle triggerbot")
 print("Press " .. config.rapidFireKey .. " to toggle rapid fire")
@@ -683,6 +848,15 @@ if autoReloadEnabled then
 else
     print("Auto Reload: DISABLED")
 end
+if silentAimEnabled then
+    print("Silent Aim: ENABLED (Target: " .. config.hitPart .. ", Max Distance: " .. config.maxDistance .. ")")
+else
+    print("Silent Aim: DISABLED")
+end
+if autoShootEnabled then
+    print("Auto Shoot: ENABLED")
+else
+    print("Auto Shoot: DISABLED")
+end
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/vejuxas/hitbox-expander/refs/heads/main/aaaa"))()
-
