@@ -1,4 +1,3 @@
-
 --[[
     		Compkiller Interface - ENHANCED VERSION
 
@@ -9998,12 +9997,13 @@ function Compkiller:KeySystem(validKeys)
 	KeyBox.BackgroundColor3 = Color3.fromRGB(10, 12, 18)
 	KeyBox.BorderSizePixel = 0
 	KeyBox.Position = UDim2.new(1, -15, 1, -15)
-	KeyBox.Size = UDim2.new(0, 280, 0, 160)
+	KeyBox.Size = UDim2.new(0, 240, 0, 135)
 	KeyBox.ZIndex = 10000
 	KeyBox.Parent = KeySystemGui
+	KeyBox.ClipsDescendants = true
 	
 	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0, 12)
+	Corner.CornerRadius = UDim.new(0, 8)
 	Corner.Parent = KeyBox
 	
 	local Stroke = Instance.new("UIStroke")
@@ -10014,23 +10014,23 @@ function Compkiller:KeySystem(validKeys)
 	
 	local Title = Instance.new("TextLabel")
 	Title.BackgroundTransparency = 1
-	Title.Position = UDim2.new(0, 0, 0, 12)
-	Title.Size = UDim2.new(1, 0, 0, 20)
+	Title.Position = UDim2.new(0, 10, 0, 8)
+	Title.Size = UDim2.new(1, -20, 0, 18)
 	Title.Font = Enum.Font.GothamMedium
 	Title.Text = "KEY VERIFICATION"
 	Title.TextColor3 = Color3.fromRGB(0, 255, 255)
-	Title.TextSize = 14
+	Title.TextSize = 13
 	Title.ZIndex = 10001
 	Title.Parent = KeyBox
 	
 	local Subtitle = Instance.new("TextLabel")
 	Subtitle.BackgroundTransparency = 1
-	Subtitle.Position = UDim2.new(0, 0, 0, 32)
-	Subtitle.Size = UDim2.new(1, 0, 0, 12)
+	Subtitle.Position = UDim2.new(0, 10, 0, 26)
+	Subtitle.Size = UDim2.new(1, -20, 0, 10)
 	Subtitle.Font = Enum.Font.Gotham
 	Subtitle.Text = "Enter your access key"
 	Subtitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Subtitle.TextSize = 10
+	Subtitle.TextSize = 9
 	Subtitle.TextTransparency = 0.5
 	Subtitle.ZIndex = 10001
 	Subtitle.Parent = KeyBox
@@ -10038,9 +10038,9 @@ function Compkiller:KeySystem(validKeys)
 	local InputFrame = Instance.new("Frame")
 	InputFrame.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 	InputFrame.BorderSizePixel = 0
-	InputFrame.Position = UDim2.new(0.5, 0, 0, 60)
-	InputFrame.Size = UDim2.new(1, -30, 0, 28)
-	InputFrame.AnchorPoint = Vector2.new(0.5, 0)
+	InputFrame.Position = UDim2.new(0, 15, 0, 48)
+	InputFrame.Size = UDim2.new(1, -30, 0, 26)
+	InputFrame.AnchorPoint = Vector2.new(0, 0)
 	InputFrame.ZIndex = 10001
 	InputFrame.Parent = KeyBox
 	
@@ -10056,30 +10056,30 @@ function Compkiller:KeySystem(validKeys)
 	
 	local KeyInput = Instance.new("TextBox")
 	KeyInput.BackgroundTransparency = 1
-	KeyInput.Position = UDim2.new(0, 10, 0, 0)
-	KeyInput.Size = UDim2.new(1, -20, 1, 0)
+	KeyInput.Position = UDim2.new(0, 8, 0, 0)
+	KeyInput.Size = UDim2.new(1, -16, 1, 0)
 	KeyInput.Font = Enum.Font.GothamBold
 	KeyInput.PlaceholderText = "Enter Key..."
 	KeyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 	KeyInput.Text = ""
 	KeyInput.TextColor3 = Color3.fromRGB(0, 255, 255)
-	KeyInput.TextSize = 13
+	KeyInput.TextSize = 11
 	KeyInput.TextXAlignment = Enum.TextXAlignment.Left
 	KeyInput.ClearTextOnFocus = false
 	KeyInput.ZIndex = 10002
 	KeyInput.Parent = InputFrame
 	
 	local SubmitBtn = Instance.new("TextButton")
-	SubmitBtn.BackgroundColor3 = Color3.fromRGB(15, 18, 25)
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(12, 15, 20)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
-	SubmitBtn.Position = UDim2.new(0.5, 0, 0, 100)
-	SubmitBtn.Size = UDim2.new(1, -30, 0, 32)
-	SubmitBtn.AnchorPoint = Vector2.new(0.5, 0)
+	SubmitBtn.Position = UDim2.new(0, 15, 0, 82)
+	SubmitBtn.Size = UDim2.new(1, -30, 0, 28)
+	SubmitBtn.AnchorPoint = Vector2.new(0, 0)
 	SubmitBtn.Font = Enum.Font.GothamBold
 	SubmitBtn.Text = "AUTHENTICATE"
 	SubmitBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
-	SubmitBtn.TextSize = 13
+	SubmitBtn.TextSize = 12
 	SubmitBtn.ZIndex = 10002
 	SubmitBtn.Parent = KeyBox
 	
@@ -10095,12 +10095,12 @@ function Compkiller:KeySystem(validKeys)
 	
 	local Status = Instance.new("TextLabel")
 	Status.BackgroundTransparency = 1
-	Status.Position = UDim2.new(0, 0, 0, 138)
-	Status.Size = UDim2.new(1, 0, 0, 15)
+	Status.Position = UDim2.new(0, 10, 0, 115)
+	Status.Size = UDim2.new(1, -20, 0, 15)
 	Status.Font = Enum.Font.Gotham
 	Status.Text = ""
 	Status.TextColor3 = Color3.fromRGB(255, 70, 100)
-	Status.TextSize = 10
+	Status.TextSize = 9
 	Status.ZIndex = 10001
 	Status.Parent = KeyBox
 	
@@ -10108,7 +10108,7 @@ function Compkiller:KeySystem(validKeys)
 	KeyBox.Size = UDim2.new(0, 0, 0, 0)
 	KeyBox.BackgroundTransparency = 1
 	TweenService:Create(KeyBox, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Size = UDim2.new(0, 280, 0, 160)
+		Size = UDim2.new(0, 240, 0, 135)
 	}):Play()
 	TweenService:Create(KeyBox, TweenInfo.new(0.3), {
 		BackgroundTransparency = 0
@@ -10116,11 +10116,11 @@ function Compkiller:KeySystem(validKeys)
 	
 	-- Button hover effects
 	SubmitBtn.MouseEnter:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 30, 40)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 25, 35)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
 	end)
 	SubmitBtn.MouseLeave:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(15, 18, 25)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(12, 15, 20)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
 	end)
 	
