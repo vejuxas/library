@@ -378,20 +378,20 @@ local Compkiller = {
 	ProtectGui = protect_gui or protectgui or (syn and syn.protect_gui) or function(s) return s; end,
 };
 
--- Premium Dark Theme with Vibrant Cyan Accents - 10/10 Clean Look
+-- Premium Dark Theme with White Accents - 10/10 Clean Look
 Compkiller.Colors = {
-	Highlight = Color3.fromRGB(0, 255, 255),  -- Bright electric cyan
-	Toggle = Color3.fromRGB(0, 255, 200),  -- Mint green for active
+	Highlight = Color3.fromRGB(255, 255, 255),  -- Clean white
+	Toggle = Color3.fromRGB(55, 55, 57),  -- Dark gray for buttons/toggles/sliders
 	Risky = Color3.fromRGB(255, 70, 100),  -- Vibrant pink red
 	BGDBColor = Color3.fromRGB(10, 12, 18),  -- Deep dark base
 	BlockColor = Color3.fromRGB(16, 20, 28),  -- Dark elevated surface
 	StrokeColor = Color3.fromRGB(35, 45, 60),  -- Subtle dark borders
 	SwitchColor = Color3.fromRGB(255, 255, 255),  -- Crisp white text
 	DropColor = Color3.fromRGB(18, 24, 35),  -- Dark dropdown
-	MouseEnter = Color3.fromRGB(0, 200, 230),  -- Cyan hover highlight
+	MouseEnter = Color3.fromRGB(70, 70, 72),  -- Light gray hover
 	BlockBackground = Color3.fromRGB(14, 18, 25),  -- Panel background
 	LineColor = Color3.fromRGB(30, 40, 55),  -- Dark separator lines
-	HighStrokeColor = Color3.fromRGB(0, 230, 255),  -- Bright cyan accent borders
+	HighStrokeColor = Color3.fromRGB(255, 255, 255),  -- White accent borders
 };
 
 Compkiller.Elements = {
