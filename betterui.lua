@@ -9978,4 +9978,258 @@ function Compkiller.newNotify()
 	return Compkiller.NOTIFY_CACHE;
 end;
 
+-- ============================================
+-- KEY SYSTEM FUNCTION
+-- ============================================
+function Compkiller:KeySystem(validKeys)
+	validKeys = validKeys or {}
+	
+	local KeySystemActive = true
+	local KeySystemGui = Instance.new("ScreenGui")
+	KeySystemGui.Name = "CompkillerKeySystem"
+	KeySystemGui.ResetOnSpawn = false
+	KeySystemGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+	KeySystemGui.Parent = CoreGui
+	
+	local KeyBox = Instance.new("Frame")
+	KeyBox.Name = "KeyContainer"
+	KeyBox.AnchorPoint = Vector2.new(1, 1)
+	KeyBox.BackgroundColor3 = Color3.fromRGB(10, 12, 18)
+	KeyBox.BorderSizePixel = 0
+	KeyBox.Position = UDim2.new(1, -15, 1, -15)
+	KeyBox.Size = UDim2.new(0, 280, 0, 160)
+	KeyBox.ZIndex = 10000
+	KeyBox.Parent = KeySystemGui
+	
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 12)
+	Corner.Parent = KeyBox
+	
+	local Stroke = Instance.new("UIStroke")
+	Stroke.Color = Color3.fromRGB(0, 255, 255)
+	Stroke.Thickness = 2
+	Stroke.Transparency = 0.5
+	Stroke.Parent = KeyBox
+	
+	local Title = Instance.new("TextLabel")
+	Title.BackgroundTransparency = 1
+	Title.Position = UDim2.new(0, 0, 0, 15)
+	Title.Size = UDim2.new(1, 0, 0, 25)
+	Title.Font = Enum.Font.GothamBold
+	Title.Text = "KEY VERIFICATION"
+	Title.TextColor3 = Color3.fromRGB(0, 255, 255)
+	Title.TextSize = 16
+	Title.ZIndex = 10001
+	Title.Parent = KeyBox
+	
+	local Subtitle = Instance.new("TextLabel")
+	Subtitle.BackgroundTransparency = 1
+	Subtitle.Position = UDim2.new(0, 0, 0, 40)
+	Subtitle.Size = UDim2.new(1, 0, 0, 15)
+	Subtitle.Font = Enum.Font.Gotham
+	Subtitle.Text = "Enter your access key"
+	Subtitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Subtitle.TextSize = 11
+	Subtitle.TextTransparency = 0.5
+	Subtitle.ZIndex = 10001
+	Subtitle.Parent = KeyBox
+	
+	local InputFrame = Instance.new("Frame")
+	InputFrame.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
+	InputFrame.BorderSizePixel = 0
+	InputFrame.Position = UDim2.new(0.5, -120, 0, 70)
+	InputFrame.Size = UDim2.new(0, 240, 0, 30)
+	InputFrame.AnchorPoint = Vector2.new(0.5, 0)
+	InputFrame.ZIndex = 10001
+	InputFrame.Parent = KeyBox
+	
+	local InputCorner = Instance.new("UICorner")
+	InputCorner.CornerRadius = UDim.new(0, 6)
+	InputCorner.Parent = InputFrame
+	
+	local InputStroke = Instance.new("UIStroke")
+	InputStroke.Color = Color3.fromRGB(0, 230, 255)
+	InputStroke.Thickness = 1.5
+	InputStroke.Transparency = 0.7
+	InputStroke.Parent = InputFrame
+	
+	local KeyInput = Instance.new("TextBox")
+	KeyInput.BackgroundTransparency = 1
+	KeyInput.Position = UDim2.new(0, 10, 0, 0)
+	KeyInput.Size = UDim2.new(1, -20, 1, 0)
+	KeyInput.Font = Enum.Font.GothamBold
+	KeyInput.PlaceholderText = "Enter Key..."
+	KeyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+	KeyInput.Text = ""
+	KeyInput.TextColor3 = Color3.fromRGB(0, 255, 255)
+	KeyInput.TextSize = 13
+	KeyInput.TextXAlignment = Enum.TextXAlignment.Left
+	KeyInput.ClearTextOnFocus = false
+	KeyInput.ZIndex = 10002
+	KeyInput.Parent = InputFrame
+	
+	local SubmitBtn = Instance.new("TextButton")
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+	SubmitBtn.BackgroundTransparency = 0.05
+	SubmitBtn.BorderSizePixel = 0
+	SubmitBtn.Position = UDim2.new(0.5, -80, 1, -40)
+	SubmitBtn.Size = UDim2.new(0, 160, 0, 28)
+	SubmitBtn.AnchorPoint = Vector2.new(0.5, 0)
+	SubmitBtn.Font = Enum.Font.GothamBold
+	SubmitBtn.Text = "VERIFY KEY"
+	SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	SubmitBtn.TextSize = 13
+	SubmitBtn.ZIndex = 10002
+	SubmitBtn.Parent = KeyBox
+	
+	local BtnCorner = Instance.new("UICorner")
+	BtnCorner.CornerRadius = UDim.new(0, 6)
+	BtnCorner.Parent = SubmitBtn
+	
+	local BtnStroke = Instance.new("UIStroke")
+	BtnStroke.Color = Color3.fromRGB(0, 255, 255)
+	BtnStroke.Thickness = 1.5
+	BtnStroke.Transparency = 0.7
+	BtnStroke.Parent = SubmitBtn
+	
+	local BtnGradient = Instance.new("UIGradient")
+	BtnGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+	})
+	BtnGradient.Rotation = 90
+	BtnGradient.Parent = SubmitBtn
+	
+	local Status = Instance.new("TextLabel")
+	Status.BackgroundTransparency = 1
+	Status.Position = UDim2.new(0, 0, 1, -15)
+	Status.Size = UDim2.new(1, 0, 0, 15)
+	Status.Font = Enum.Font.Gotham
+	Status.Text = ""
+	Status.TextColor3 = Color3.fromRGB(255, 70, 100)
+	Status.TextSize = 10
+	Status.ZIndex = 10001
+	Status.Parent = KeyBox
+	
+	-- Entrance animation
+	KeyBox.Size = UDim2.new(0, 0, 0, 0)
+	KeyBox.BackgroundTransparency = 1
+	TweenService:Create(KeyBox, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Size = UDim2.new(0, 280, 0, 160)
+	}):Play()
+	TweenService:Create(KeyBox, TweenInfo.new(0.3), {
+		BackgroundTransparency = 0
+	}):Play()
+	
+	-- Button hover effects
+	SubmitBtn.MouseEnter:Connect(function()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
+	end)
+	SubmitBtn.MouseLeave:Connect(function()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.05}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
+	end)
+	
+	-- Input focus effects
+	KeyInput.Focused:Connect(function()
+		TweenService:Create(InputStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
+	end)
+	KeyInput.FocusLost:Connect(function()
+		TweenService:Create(InputStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
+	end)
+	
+	local function ValidateKey(key)
+		for _, validKey in ipairs(validKeys) do
+			if key == validKey then
+				return true
+			end
+		end
+		return false
+	end
+	
+	local function SubmitKey()
+		local key = KeyInput.Text
+		
+		if key == "" then
+			Status.Text = "Please enter a key"
+			Status.TextColor3 = Color3.fromRGB(255, 70, 100)
+			
+			-- Shake animation
+			local originalPos = KeyBox.Position
+			for i = 1, 4 do
+				TweenService:Create(KeyBox, TweenInfo.new(0.05, Enum.EasingStyle.Linear), {
+					Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + (3 * (i % 2 == 0 and 1 or -1)), originalPos.Y.Scale, originalPos.Y.Offset)
+				}):Play()
+				task.wait(0.05)
+			end
+			TweenService:Create(KeyBox, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Position = originalPos
+			}):Play()
+			return
+		end
+		
+		if ValidateKey(key) then
+			-- Success
+			Status.Text = "✓ Access Granted!"
+			Status.TextColor3 = Color3.fromRGB(0, 255, 200)
+			
+			TweenService:Create(Stroke, TweenInfo.new(0.3), {
+				Color = Color3.fromRGB(0, 255, 200)
+			}):Play()
+			
+			task.wait(0.5)
+			
+			-- Close key system
+			TweenService:Create(KeyBox, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+				Size = UDim2.new(0, 0, 0, 0)
+			}):Play()
+			TweenService:Create(KeyBox, TweenInfo.new(0.3), {
+				BackgroundTransparency = 1
+			}):Play()
+			
+			task.wait(0.5)
+			KeySystemGui:Destroy()
+			KeySystemActive = false
+		else
+			-- Invalid key
+			Status.Text = "✗ Invalid Key"
+			Status.TextColor3 = Color3.fromRGB(255, 70, 100)
+			
+			TweenService:Create(Stroke, TweenInfo.new(0.2), {
+				Color = Color3.fromRGB(255, 70, 100),
+				Transparency = 0.3
+			}):Play()
+			
+			-- Shake animation
+			local originalPos = KeyBox.Position
+			for i = 1, 6 do
+				TweenService:Create(KeyBox, TweenInfo.new(0.05, Enum.EasingStyle.Linear), {
+					Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + (5 * (i % 2 == 0 and 1 or -1)), originalPos.Y.Scale, originalPos.Y.Offset)
+				}):Play()
+				task.wait(0.05)
+			end
+			TweenService:Create(KeyBox, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Position = originalPos
+			}):Play()
+			
+			task.wait(0.5)
+			TweenService:Create(Stroke, TweenInfo.new(0.3), {
+				Color = Color3.fromRGB(0, 255, 255),
+				Transparency = 0.5
+			}):Play()
+		end
+	end
+	
+	SubmitBtn.MouseButton1Click:Connect(SubmitKey)
+	KeyInput.FocusLost:Connect(function(enterPressed)
+		if enterPressed then
+			SubmitKey()
+		end
+	end)
+	
+	-- Wait for key verification before continuing
+	repeat task.wait(0.1) until not KeySystemActive
+end
+
 return Compkiller;
