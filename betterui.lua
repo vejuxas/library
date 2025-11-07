@@ -9997,7 +9997,7 @@ function Compkiller:KeySystem(validKeys)
 	KeyBox.BackgroundColor3 = Color3.fromRGB(10, 12, 18)
 	KeyBox.BorderSizePixel = 0
 	KeyBox.Position = UDim2.new(1, -15, 1, -15)
-	KeyBox.Size = UDim2.new(0, 240, 0, 135)
+	KeyBox.Size = UDim2.new(0, 240, 0, 115)
 	KeyBox.ZIndex = 10000
 	KeyBox.Parent = KeySystemGui
 	KeyBox.ClipsDescendants = true
@@ -10015,9 +10015,9 @@ function Compkiller:KeySystem(validKeys)
 	local Title = Instance.new("TextLabel")
 	Title.BackgroundTransparency = 1
 	Title.Position = UDim2.new(0, 10, 0, 8)
-	Title.Size = UDim2.new(1, -20, 0, 18)
+	Title.Size = UDim2.new(1, -20, 0, 16)
 	Title.Font = Enum.Font.GothamMedium
-	Title.Text = "KEY VERIFICATION"
+	Title.Text = "Key Verification"
 	Title.TextColor3 = Color3.fromRGB(0, 255, 255)
 	Title.TextSize = 13
 	Title.ZIndex = 10001
@@ -10025,7 +10025,7 @@ function Compkiller:KeySystem(validKeys)
 	
 	local Subtitle = Instance.new("TextLabel")
 	Subtitle.BackgroundTransparency = 1
-	Subtitle.Position = UDim2.new(0, 10, 0, 26)
+	Subtitle.Position = UDim2.new(0, 10, 0, 24)
 	Subtitle.Size = UDim2.new(1, -20, 0, 10)
 	Subtitle.Font = Enum.Font.Gotham
 	Subtitle.Text = "Enter your access key"
@@ -10038,8 +10038,8 @@ function Compkiller:KeySystem(validKeys)
 	local InputFrame = Instance.new("Frame")
 	InputFrame.BackgroundColor3 = Color3.fromRGB(18, 24, 35)
 	InputFrame.BorderSizePixel = 0
-	InputFrame.Position = UDim2.new(0, 15, 0, 48)
-	InputFrame.Size = UDim2.new(1, -30, 0, 26)
+	InputFrame.Position = UDim2.new(0, 15, 0, 42)
+	InputFrame.Size = UDim2.new(1, -30, 0, 24)
 	InputFrame.AnchorPoint = Vector2.new(0, 0)
 	InputFrame.ZIndex = 10001
 	InputFrame.Parent = KeyBox
@@ -10073,13 +10073,13 @@ function Compkiller:KeySystem(validKeys)
 	SubmitBtn.BackgroundColor3 = Color3.fromRGB(12, 15, 20)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
-	SubmitBtn.Position = UDim2.new(0, 15, 0, 82)
-	SubmitBtn.Size = UDim2.new(1, -30, 0, 28)
+	SubmitBtn.Position = UDim2.new(0, 15, 0, 72)
+	SubmitBtn.Size = UDim2.new(1, -30, 0, 26)
 	SubmitBtn.AnchorPoint = Vector2.new(0, 0)
 	SubmitBtn.Font = Enum.Font.GothamBold
-	SubmitBtn.Text = "AUTHENTICATE"
+	SubmitBtn.Text = "Redeem Key"
 	SubmitBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
-	SubmitBtn.TextSize = 12
+	SubmitBtn.TextSize = 11
 	SubmitBtn.ZIndex = 10002
 	SubmitBtn.Parent = KeyBox
 	
@@ -10095,8 +10095,8 @@ function Compkiller:KeySystem(validKeys)
 	
 	local Status = Instance.new("TextLabel")
 	Status.BackgroundTransparency = 1
-	Status.Position = UDim2.new(0, 10, 0, 115)
-	Status.Size = UDim2.new(1, -20, 0, 15)
+	Status.Position = UDim2.new(0, 10, 0, 102)
+	Status.Size = UDim2.new(1, -20, 0, 10)
 	Status.Font = Enum.Font.Gotham
 	Status.Text = ""
 	Status.TextColor3 = Color3.fromRGB(255, 70, 100)
@@ -10108,7 +10108,7 @@ function Compkiller:KeySystem(validKeys)
 	KeyBox.Size = UDim2.new(0, 0, 0, 0)
 	KeyBox.BackgroundTransparency = 1
 	TweenService:Create(KeyBox, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Size = UDim2.new(0, 240, 0, 135)
+		Size = UDim2.new(0, 240, 0, 115)
 	}):Play()
 	TweenService:Create(KeyBox, TweenInfo.new(0.3), {
 		BackgroundTransparency = 0
@@ -10147,18 +10147,6 @@ function Compkiller:KeySystem(validKeys)
 		if key == "" then
 			Status.Text = "Please enter a key"
 			Status.TextColor3 = Color3.fromRGB(255, 70, 100)
-			
-			-- Shake animation
-			local originalPos = KeyBox.Position
-			for i = 1, 4 do
-				TweenService:Create(KeyBox, TweenInfo.new(0.05, Enum.EasingStyle.Linear), {
-					Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + (3 * (i % 2 == 0 and 1 or -1)), originalPos.Y.Scale, originalPos.Y.Offset)
-				}):Play()
-				task.wait(0.05)
-			end
-			TweenService:Create(KeyBox, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Position = originalPos
-			}):Play()
 			return
 		end
 		
@@ -10186,31 +10174,8 @@ function Compkiller:KeySystem(validKeys)
 			KeySystemActive = false
 		else
 			-- Invalid key
-			Status.Text = "✗ Invalid Key"
+			Status.Text = "Invalid Key"
 			Status.TextColor3 = Color3.fromRGB(255, 70, 100)
-			
-			TweenService:Create(Stroke, TweenInfo.new(0.2), {
-				Color = Color3.fromRGB(255, 70, 100),
-				Transparency = 0.3
-			}):Play()
-			
-			-- Shake animation
-			local originalPos = KeyBox.Position
-			for i = 1, 6 do
-				TweenService:Create(KeyBox, TweenInfo.new(0.05, Enum.EasingStyle.Linear), {
-					Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + (5 * (i % 2 == 0 and 1 or -1)), originalPos.Y.Scale, originalPos.Y.Offset)
-				}):Play()
-				task.wait(0.05)
-			end
-			TweenService:Create(KeyBox, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Position = originalPos
-			}):Play()
-			
-			task.wait(0.5)
-			TweenService:Create(Stroke, TweenInfo.new(0.3), {
-				Color = Color3.fromRGB(0, 255, 255),
-				Transparency = 0.5
-			}):Play()
 		end
 	end
 	
