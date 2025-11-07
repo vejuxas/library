@@ -1562,7 +1562,7 @@ function Compkiller:_Animation(Self: Instance , Info: TweenInfo , Property :{[K]
 	return Tween;
 end;
 
--- Enhanced input with click ripple effect
+-- Enhanced input (ripple removed for clean look)
 function Compkiller:_Input(Frame : Frame , Callback : () -> ()) : TextButton
 	local Button = Instance.new('TextButton',Frame);
 
@@ -1573,34 +1573,6 @@ function Compkiller:_Input(Frame : Frame , Callback : () -> ()) : TextButton
 
 	if Callback then
 		Button.MouseButton1Click:Connect(function()
-			-- Create ripple effect on click
-			local Ripple = Instance.new("Frame")
-			Ripple.Name = "Ripple"
-			Ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-			Ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Ripple.BackgroundTransparency = 0.5
-			Ripple.BorderSizePixel = 0
-			Ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Ripple.Size = UDim2.new(0, 0, 0, 0)
-			Ripple.ZIndex = Frame.ZIndex + 50
-			Ripple.Parent = Frame
-			
-			local Corner = Instance.new("UICorner")
-			Corner.CornerRadius = UDim.new(1, 0)
-			Corner.Parent = Ripple
-			
-			local maxSize = math.max(Frame.AbsoluteSize.X, Frame.AbsoluteSize.Y) * 2
-			
-			-- Expand ripple
-			Compkiller:_Animation(Ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Size = UDim2.new(0, maxSize, 0, maxSize),
-				BackgroundTransparency = 1
-			})
-			
-			task.delay(0.5, function()
-				Ripple:Destroy()
-			end)
-			
 			Callback();
 		end);
 	end;
@@ -10145,7 +10117,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	DurationDisplay.Parent = KeyBox
 	
 	local SubmitBtn = Instance.new("TextButton")
-	SubmitBtn.BackgroundColor3 = Color3.fromRGB(12, 14, 18)
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 57)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
 	SubmitBtn.Position = UDim2.new(0, 15, 0, 100)
@@ -10171,8 +10143,8 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	local BtnGradient = Instance.new("UIGradient")
 	BtnGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 20, 25)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 10, 14))
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 62)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 52))
 	})
 	BtnGradient.Rotation = 90
 	BtnGradient.Parent = SubmitBtn
@@ -10200,11 +10172,11 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	-- Button hover effects
 	SubmitBtn.MouseEnter:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 28, 35)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(70, 70, 72)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
 	end)
 	SubmitBtn.MouseLeave:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(12, 14, 18)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(55, 55, 57)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.6}):Play()
 	end)
 	
@@ -10226,15 +10198,6 @@ function Compkiller:KeySystem(validKeys, duration)
 	end
 	
 	local function SubmitKey()
-		-- Button scale animation on click
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.1), {
-			Size = UDim2.new(1, -28, 0, 30)
-		}):Play()
-		task.wait(0.1)
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.1), {
-			Size = UDim2.new(1, -30, 0, 28)
-		}):Play()
-		
 		local key = KeyInput.Text
 		
 		if key == "" then
