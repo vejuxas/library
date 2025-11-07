@@ -1562,7 +1562,7 @@ function Compkiller:_Animation(Self: Instance , Info: TweenInfo , Property :{[K]
 	return Tween;
 end;
 
--- Enhanced input (ripple removed for clean look)
+-- Enhanced input with click ripple effect
 function Compkiller:_Input(Frame : Frame , Callback : () -> ()) : TextButton
 	local Button = Instance.new('TextButton',Frame);
 
@@ -1573,6 +1573,34 @@ function Compkiller:_Input(Frame : Frame , Callback : () -> ()) : TextButton
 
 	if Callback then
 		Button.MouseButton1Click:Connect(function()
+			-- Create ripple effect on click
+			local Ripple = Instance.new("Frame")
+			Ripple.Name = "Ripple"
+			Ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+			Ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Ripple.BackgroundTransparency = 0.5
+			Ripple.BorderSizePixel = 0
+			Ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+			Ripple.Size = UDim2.new(0, 0, 0, 0)
+			Ripple.ZIndex = Frame.ZIndex + 50
+			Ripple.Parent = Frame
+			
+			local Corner = Instance.new("UICorner")
+			Corner.CornerRadius = UDim.new(1, 0)
+			Corner.Parent = Ripple
+			
+			local maxSize = math.max(Frame.AbsoluteSize.X, Frame.AbsoluteSize.Y) * 2
+			
+			-- Expand ripple
+			Compkiller:_Animation(Ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = UDim2.new(0, maxSize, 0, maxSize),
+				BackgroundTransparency = 1
+			})
+			
+			task.delay(0.5, function()
+				Ripple:Destroy()
+			end)
+			
 			Callback();
 		end);
 	end;
@@ -4315,7 +4343,12 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 			end;
 		end);
 
-		Compkiller:_Input(Frame,function()
+		local ButtonInput = Instance.new('TextButton',Frame);
+		ButtonInput.ZIndex = Frame.ZIndex + 10;
+		ButtonInput.Size = UDim2.fromScale(1,1);
+		ButtonInput.BackgroundTransparency = 1;
+		ButtonInput.TextTransparency = 1;
+		ButtonInput.MouseButton1Click:Connect(function()
 			Config.Callback();
 		end);
 
