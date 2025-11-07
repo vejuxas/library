@@ -384,10 +384,10 @@ Compkiller.Colors = {
 	Toggle = Color3.fromRGB(55, 55, 57),  -- Dark gray for buttons/toggles/sliders
 	Risky = Color3.fromRGB(255, 70, 100),  -- Vibrant pink red
 	BGDBColor = Color3.fromRGB(10, 12, 18),  -- Deep dark base
-	BlockColor = Color3.fromRGB(55, 55, 57),  -- Dark elevated surface
+	BlockColor = Color3.fromRGB(16, 20, 28),  -- Dark elevated surface
 	StrokeColor = Color3.fromRGB(35, 45, 60),  -- Subtle dark borders
 	SwitchColor = Color3.fromRGB(255, 255, 255),  -- Crisp white text
-	DropColor = Color3.fromRGB(18, 24, 35),  -- Dark dropdown
+	DropColor = Color3.fromRGB(55, 55, 57),  -- Dark dropdown
 	MouseEnter = Color3.fromRGB(70, 70, 72),  -- Light gray hover
 	BlockBackground = Color3.fromRGB(14, 18, 25),  -- Panel background
 	LineColor = Color3.fromRGB(30, 40, 55),  -- Dark separator lines
@@ -10315,4 +10315,5 @@ function Compkiller:KeySystem(validKeys, duration)
 end
 
 return Compkiller;
+
 
