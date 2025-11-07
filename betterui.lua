@@ -10071,9 +10071,9 @@ function Compkiller:KeySystem(validKeys, duration)
 	Corner.Parent = KeyBox
 	
 	local Stroke = Instance.new("UIStroke")
-	Stroke.Color = Color3.fromRGB(0, 255, 255)
+	Stroke.Color = Color3.fromRGB(255, 255, 255)
 	Stroke.Thickness = 2
-	Stroke.Transparency = 0.5
+	Stroke.Transparency = 0.7
 	Stroke.Parent = KeyBox
 	
 	local Title = Instance.new("TextLabel")
@@ -10082,7 +10082,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	Title.Size = UDim2.new(1, -20, 0, 16)
 	Title.Font = Enum.Font.GothamMedium
 	Title.Text = "Key Verification"
-	Title.TextColor3 = Color3.fromRGB(0, 255, 255)
+	Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 	Title.TextSize = 13
 	Title.ZIndex = 10001
 	Title.Parent = KeyBox
@@ -10113,7 +10113,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	InputCorner.Parent = InputFrame
 	
 	local InputStroke = Instance.new("UIStroke")
-	InputStroke.Color = Color3.fromRGB(0, 230, 255)
+	InputStroke.Color = Color3.fromRGB(255, 255, 255)
 	InputStroke.Thickness = 1.5
 	InputStroke.Transparency = 0.7
 	InputStroke.Parent = InputFrame
@@ -10126,7 +10126,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	KeyInput.PlaceholderText = "Enter Key..."
 	KeyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 	KeyInput.Text = ""
-	KeyInput.TextColor3 = Color3.fromRGB(0, 255, 255)
+	KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 	KeyInput.TextSize = 11
 	KeyInput.TextXAlignment = Enum.TextXAlignment.Left
 	KeyInput.ClearTextOnFocus = false
@@ -10142,13 +10142,13 @@ function Compkiller:KeySystem(validKeys, duration)
 	DurationDisplay.Text = "Duration: " .. duration
 	DurationDisplay.TextColor3 = Color3.fromRGB(255, 255, 255)
 	DurationDisplay.TextSize = 9
-	DurationDisplay.TextTransparency = 0.5
+	DurationDisplay.TextTransparency = 0.6
 	DurationDisplay.TextXAlignment = Enum.TextXAlignment.Center
 	DurationDisplay.ZIndex = 10001
 	DurationDisplay.Parent = KeyBox
 	
 	local SubmitBtn = Instance.new("TextButton")
-	SubmitBtn.BackgroundColor3 = Color3.fromRGB(25, 32, 45)
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(37, 37, 39)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
 	SubmitBtn.Position = UDim2.new(0, 15, 0, 100)
@@ -10159,6 +10159,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	SubmitBtn.TextSize = 11
 	SubmitBtn.ZIndex = 10002
+	SubmitBtn.AutoButtonColor = false
 	SubmitBtn.Parent = KeyBox
 	
 	local BtnCorner = Instance.new("UICorner")
@@ -10166,15 +10167,15 @@ function Compkiller:KeySystem(validKeys, duration)
 	BtnCorner.Parent = SubmitBtn
 	
 	local BtnStroke = Instance.new("UIStroke")
-	BtnStroke.Color = Color3.fromRGB(40, 50, 65)
+	BtnStroke.Color = Color3.fromRGB(255, 255, 255)
 	BtnStroke.Thickness = 1
-	BtnStroke.Transparency = 0.5
+	BtnStroke.Transparency = 0.7
 	BtnStroke.Parent = SubmitBtn
 	
 	local BtnGradient = Instance.new("UIGradient")
 	BtnGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(22, 27, 38)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 18, 25))
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 42)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(34, 34, 36))
 	})
 	BtnGradient.Rotation = 90
 	BtnGradient.Parent = SubmitBtn
@@ -10202,17 +10203,17 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	-- Button hover effects
 	SubmitBtn.MouseEnter:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 45, 60)}):Play()
-		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 52)}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
 	end)
 	SubmitBtn.MouseLeave:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 32, 45)}):Play()
-		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(37, 37, 39)}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
 	end)
 	
 	-- Input focus effects
 	KeyInput.Focused:Connect(function()
-		TweenService:Create(InputStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
+		TweenService:Create(InputStroke, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
 	end)
 	KeyInput.FocusLost:Connect(function()
 		TweenService:Create(InputStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
@@ -10228,6 +10229,15 @@ function Compkiller:KeySystem(validKeys, duration)
 	end
 	
 	local function SubmitKey()
+		-- Button scale animation on click
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.1), {
+			Size = UDim2.new(1, -28, 0, 30)
+		}):Play()
+		task.wait(0.1)
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.1), {
+			Size = UDim2.new(1, -30, 0, 28)
+		}):Play()
+		
 		local key = KeyInput.Text
 		
 		if key == "" then
@@ -10251,7 +10261,8 @@ function Compkiller:KeySystem(validKeys, duration)
 			Status.TextColor3 = Color3.fromRGB(0, 255, 200)
 			
 			TweenService:Create(Stroke, TweenInfo.new(0.3), {
-				Color = Color3.fromRGB(0, 255, 200)
+				Color = Color3.fromRGB(0, 255, 200),
+				Transparency = 0.4
 			}):Play()
 			
 			task.wait(0.5)
