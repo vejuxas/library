@@ -366,7 +366,7 @@ local CurrentCamera: Camera? = cloneref(workspace.CurrentCamera);
 
 local Compkiller = {
 	Version = '2.4',
-	Logo = "rbxassetid://120245531583106",
+	Logo = "rbxassetid://78456880027331",
 	Windows = {},
 	Scale = {
 		Window = UDim2.new(0, 485,0, 565),
@@ -4271,20 +4271,15 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 
 		Frame.Parent = Button
 		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-		Frame.BackgroundColor3 = Compkiller.Colors.Highlight
-		Frame.BackgroundTransparency = 0.05  -- More opaque for better visibility
+		Frame.BackgroundColor3 = Color3.fromRGB(55, 55, 57)  -- #373739
+		Frame.BackgroundTransparency = 0  -- Fully opaque
 		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Frame.BorderSizePixel = 0
 		Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
 		Frame.Size = UDim2.new(1, -15, 1, -5)
 		Frame.ZIndex = Zindex + 7;
 
-		table.insert(Compkiller.Elements.Highlight,{
-			Element = Frame,
-			Property = "BackgroundColor3"
-		});
-
-		UIStroke.Color = Compkiller.Colors.Highlight
+		UIStroke.Color = Color3.fromRGB(255, 255, 255)
 		UIStroke.Thickness = 1.5  -- Thicker border for better definition
 		UIStroke.Transparency = 0.7  -- Semi-transparent glow
 		UIStroke.Parent = Frame
@@ -4300,8 +4295,8 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		-- Add gradient for premium depth
 		local Gradient = Instance.new("UIGradient")
 		Gradient.Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 62)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 52))
 		})
 		Gradient.Rotation = 90
 		Gradient.Parent = Frame
@@ -4329,6 +4324,7 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		Compkiller:_Hover(Frame,function()
 			if Signal:GetValue() then
 				Compkiller:_Animation(Frame,TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+					BackgroundColor3 = Color3.fromRGB(70, 70, 72),
 					BackgroundTransparency = 0
 				})
 				Compkiller:_Animation(UIStroke,TweenInfo.new(0.2),{
@@ -4338,7 +4334,8 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		end,function()
 			if Signal:GetValue() then
 				Compkiller:_Animation(Frame,TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
-					BackgroundTransparency = 0.05
+					BackgroundColor3 = Color3.fromRGB(55, 55, 57),
+					BackgroundTransparency = 0
 				})
 				Compkiller:_Animation(UIStroke,TweenInfo.new(0.2),{
 					Transparency = 0.7  -- Normal glow
@@ -4359,7 +4356,7 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 				});
 
 				Compkiller:_Animation(Frame, TweenInfo.new(0.35),{
-					BackgroundTransparency = 0.1
+					BackgroundTransparency = 0
 				});
 
 				Compkiller:_Animation(UIStroke, TweenInfo.new(0.35),{
@@ -4501,11 +4498,11 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		SliderInput.Name = Compkiller:_RandomString()
 		SliderInput.Parent = SliderBar
 		SliderInput.AnchorPoint = Vector2.new(0, 0.5)
-		SliderInput.BackgroundColor3 = Compkiller.Colors.Highlight
+		SliderInput.BackgroundColor3 = Color3.fromRGB(55, 55, 57)
 		
 		-- Add glow to slider fill
 		local SliderGlow = Instance.new("UIStroke")
-		SliderGlow.Color = Compkiller.Colors.Highlight
+		SliderGlow.Color = Color3.fromRGB(255, 255, 255)
 		SliderGlow.Thickness = 1.5
 		SliderGlow.Transparency = 0.5
 		SliderGlow.Parent = SliderInput
@@ -10148,7 +10145,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	DurationDisplay.Parent = KeyBox
 	
 	local SubmitBtn = Instance.new("TextButton")
-	SubmitBtn.BackgroundColor3 = Color3.fromRGB(37, 37, 39)
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(12, 14, 18)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
 	SubmitBtn.Position = UDim2.new(0, 15, 0, 100)
@@ -10168,14 +10165,14 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	local BtnStroke = Instance.new("UIStroke")
 	BtnStroke.Color = Color3.fromRGB(255, 255, 255)
-	BtnStroke.Thickness = 1
-	BtnStroke.Transparency = 0.7
+	BtnStroke.Thickness = 1.5
+	BtnStroke.Transparency = 0.6
 	BtnStroke.Parent = SubmitBtn
 	
 	local BtnGradient = Instance.new("UIGradient")
 	BtnGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 42)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(34, 34, 36))
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 20, 25)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 10, 14))
 	})
 	BtnGradient.Rotation = 90
 	BtnGradient.Parent = SubmitBtn
@@ -10203,12 +10200,12 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	-- Button hover effects
 	SubmitBtn.MouseEnter:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 52)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 28, 35)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
 	end)
 	SubmitBtn.MouseLeave:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(37, 37, 39)}):Play()
-		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(12, 14, 18)}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.6}):Play()
 	end)
 	
 	-- Input focus effects
@@ -10315,5 +10312,3 @@ function Compkiller:KeySystem(validKeys, duration)
 end
 
 return Compkiller;
-
-
