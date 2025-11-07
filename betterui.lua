@@ -13,14 +13,15 @@
         Secure mode: this will cache all images to your workspace and disabled blur
     
     ENHANCEMENTS:
-    ✓ Modern color palette (indigo/purple theme)
-    ✓ Smoother animations (Exponential, Back, Sine easing)
+    ✓ Premium cyan/neon blue gaming color palette
+    ✓ Electric cyan accents with neon green toggles
+    ✓ Ultra-smooth animations (Exponential, Back, Sine easing)
     ✓ Better font weights (GothamSemibold)
     ✓ Improved corner radius (8-12px for modern rounded look)
-    ✓ Enhanced hover effects with scale and color transitions
+    ✓ Enhanced hover effects with glow and scale transitions
     ✓ Bouncy toggle animations for satisfying feel
     ✓ Spring-based slider movements
-    ✓ Cinematic loader animations
+    ✓ Cinematic loader animations with dramatic effects
     ✓ Better visual feedback on all interactions
 --]]
 
@@ -361,20 +362,20 @@ local Compkiller = {
 	ProtectGui = protect_gui or protectgui or (syn and syn.protect_gui) or function(s) return s; end,
 };
 
--- Enhanced modern color palette with better contrast and visual appeal
+-- Premium Cyan/Neon Blue Gaming Color Palette - Clean and Modern
 Compkiller.Colors = {
-	Highlight = Color3.fromRGB(99, 102, 241),  -- Modern indigo (primary action color)
-	Toggle = Color3.fromRGB(34, 197, 94),  -- Vibrant green (success/enabled state)
-	Risky = Color3.fromRGB(239, 68, 68),  -- Bright red (warning/danger)
-	BGDBColor = Color3.fromRGB(17, 24, 39),  -- Deep dark background
-	BlockColor = Color3.fromRGB(31, 41, 55),  -- Elevated surface
-	StrokeColor = Color3.fromRGB(75, 85, 99),  -- Subtle borders
-	SwitchColor = Color3.fromRGB(248, 250, 252),  -- Almost white text
-	DropColor = Color3.fromRGB(55, 65, 81),  -- Dropdown background
-	MouseEnter = Color3.fromRGB(99, 102, 241),  -- Highlight on hover
-	BlockBackground = Color3.fromRGB(24, 24, 27),  -- Card background
-	LineColor = Color3.fromRGB(63, 63, 70),  -- Divider lines
-	HighStrokeColor = Color3.fromRGB(99, 102, 241),  -- Accent borders
+	Highlight = Color3.fromRGB(0, 230, 255),  -- Electric cyan (primary accent)
+	Toggle = Color3.fromRGB(0, 255, 170),  -- Neon green (active state)
+	Risky = Color3.fromRGB(255, 85, 127),  -- Hot pink (danger/warning)
+	BGDBColor = Color3.fromRGB(12, 15, 22),  -- Ultra dark background
+	BlockColor = Color3.fromRGB(20, 25, 35),  -- Slightly lighter surface
+	StrokeColor = Color3.fromRGB(40, 50, 65),  -- Subtle cyan-tinted borders
+	SwitchColor = Color3.fromRGB(255, 255, 255),  -- Pure white text
+	DropColor = Color3.fromRGB(25, 32, 45),  -- Dropdown dark blue
+	MouseEnter = Color3.fromRGB(15, 180, 220),  -- Darker cyan on hover
+	BlockBackground = Color3.fromRGB(18, 22, 30),  -- Card/panel background
+	LineColor = Color3.fromRGB(45, 55, 70),  -- Divider lines with blue tint
+	HighStrokeColor = Color3.fromRGB(0, 200, 255),  -- Glowing cyan borders
 };
 
 Compkiller.Elements = {
@@ -4388,7 +4389,7 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 					TextTransparency = 0
 				})
 				Compkiller:_Animation(SliderInput,TweenInfo.new(0.2),{
-					BackgroundColor3 = Color3.fromRGB(129, 140, 248)  -- Brighter highlight on hover
+					BackgroundColor3 = Color3.fromRGB(50, 255, 255)  -- Brighter cyan glow on hover
 				})
 			end;
 		end,function()
