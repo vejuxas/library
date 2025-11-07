@@ -10070,15 +10070,15 @@ function Compkiller:KeySystem(validKeys)
 	KeyInput.Parent = InputFrame
 	
 	local SubmitBtn = Instance.new("TextButton")
-	SubmitBtn.BackgroundColor3 = Color3.fromRGB(12, 15, 20)
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
 	SubmitBtn.Position = UDim2.new(0, 15, 0, 72)
 	SubmitBtn.Size = UDim2.new(1, -30, 0, 26)
 	SubmitBtn.AnchorPoint = Vector2.new(0, 0)
-	SubmitBtn.Font = Enum.Font.GothamBold
+	SubmitBtn.Font = Enum.Font.GothamSemibold
 	SubmitBtn.Text = "Redeem Key"
-	SubmitBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
+	SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	SubmitBtn.TextSize = 11
 	SubmitBtn.ZIndex = 10002
 	SubmitBtn.Parent = KeyBox
@@ -10191,3 +10191,4 @@ function Compkiller:KeySystem(validKeys)
 end
 
 return Compkiller;
+
