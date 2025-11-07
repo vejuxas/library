@@ -9981,10 +9981,34 @@ end;
 -- ============================================
 -- KEY SYSTEM FUNCTION
 -- ============================================
-function Compkiller:KeySystem(validKeys)
+function Compkiller:KeySystem(validKeys, duration)
 	validKeys = validKeys or {}
+	duration = duration or "Never"
 	
 	local KeySystemActive = true
+	local ExpiryDate = "NEVER"
+	
+	-- Calculate expiry date based on duration
+	local function CalculateExpiry(dur)
+		if dur == "Never" then
+			return "NEVER"
+		elseif dur == "New Key" then
+			return "NEW KEY"
+		elseif dur == "1 Day" then
+			local expiry = os.time() + (24 * 60 * 60)
+			return os.date("%d/%m/%Y", expiry)
+		elseif dur == "1 Week" then
+			local expiry = os.time() + (7 * 24 * 60 * 60)
+			return os.date("%d/%m/%Y", expiry)
+		elseif dur == "2 Weeks" then
+			local expiry = os.time() + (14 * 24 * 60 * 60)
+			return os.date("%d/%m/%Y", expiry)
+		end
+		return "NEVER"
+	end
+	
+	ExpiryDate = CalculateExpiry(duration)
+	
 	local KeySystemGui = Instance.new("ScreenGui")
 	KeySystemGui.Name = "CompkillerKeySystem"
 	KeySystemGui.ResetOnSpawn = false
@@ -9997,7 +10021,7 @@ function Compkiller:KeySystem(validKeys)
 	KeyBox.BackgroundColor3 = Color3.fromRGB(10, 12, 18)
 	KeyBox.BorderSizePixel = 0
 	KeyBox.Position = UDim2.new(1, -15, 1, -15)
-	KeyBox.Size = UDim2.new(0, 240, 0, 115)
+	KeyBox.Size = UDim2.new(0, 240, 0, 140)
 	KeyBox.ZIndex = 10000
 	KeyBox.Parent = KeySystemGui
 	KeyBox.ClipsDescendants = true
@@ -10069,11 +10093,25 @@ function Compkiller:KeySystem(validKeys)
 	KeyInput.ZIndex = 10002
 	KeyInput.Parent = InputFrame
 	
+	-- Duration display (not editable)
+	local DurationDisplay = Instance.new("TextLabel")
+	DurationDisplay.BackgroundTransparency = 1
+	DurationDisplay.Position = UDim2.new(0, 15, 0, 72)
+	DurationDisplay.Size = UDim2.new(1, -30, 0, 26)
+	DurationDisplay.Font = Enum.Font.GothamMedium
+	DurationDisplay.Text = "Duration: " .. duration
+	DurationDisplay.TextColor3 = Color3.fromRGB(255, 255, 255)
+	DurationDisplay.TextSize = 9
+	DurationDisplay.TextTransparency = 0.5
+	DurationDisplay.TextXAlignment = Enum.TextXAlignment.Center
+	DurationDisplay.ZIndex = 10001
+	DurationDisplay.Parent = KeyBox
+	
 	local SubmitBtn = Instance.new("TextButton")
 	SubmitBtn.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
-	SubmitBtn.Position = UDim2.new(0, 15, 0, 72)
+	SubmitBtn.Position = UDim2.new(0, 15, 0, 102)
 	SubmitBtn.Size = UDim2.new(1, -30, 0, 26)
 	SubmitBtn.AnchorPoint = Vector2.new(0, 0)
 	SubmitBtn.Font = Enum.Font.GothamSemibold
@@ -10088,19 +10126,27 @@ function Compkiller:KeySystem(validKeys)
 	BtnCorner.Parent = SubmitBtn
 	
 	local BtnStroke = Instance.new("UIStroke")
-	BtnStroke.Color = Color3.fromRGB(0, 255, 255)
-	BtnStroke.Thickness = 1.5
-	BtnStroke.Transparency = 0.7
+	BtnStroke.Color = Color3.fromRGB(40, 50, 65)
+	BtnStroke.Thickness = 1
+	BtnStroke.Transparency = 0.5
 	BtnStroke.Parent = SubmitBtn
+	
+	local BtnGradient = Instance.new("UIGradient")
+	BtnGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(22, 27, 38)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 18, 25))
+	})
+	BtnGradient.Rotation = 90
+	BtnGradient.Parent = SubmitBtn
 	
 	local Status = Instance.new("TextLabel")
 	Status.BackgroundTransparency = 1
-	Status.Position = UDim2.new(0, 10, 0, 102)
+	Status.Position = UDim2.new(0, 10, 0, 132)
 	Status.Size = UDim2.new(1, -20, 0, 10)
 	Status.Font = Enum.Font.Gotham
 	Status.Text = ""
 	Status.TextColor3 = Color3.fromRGB(255, 70, 100)
-	Status.TextSize = 9
+	Status.TextSize = 8
 	Status.ZIndex = 10001
 	Status.Parent = KeyBox
 	
@@ -10108,7 +10154,7 @@ function Compkiller:KeySystem(validKeys)
 	KeyBox.Size = UDim2.new(0, 0, 0, 0)
 	KeyBox.BackgroundTransparency = 1
 	TweenService:Create(KeyBox, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Size = UDim2.new(0, 240, 0, 115)
+		Size = UDim2.new(0, 240, 0, 140)
 	}):Play()
 	TweenService:Create(KeyBox, TweenInfo.new(0.3), {
 		BackgroundTransparency = 0
@@ -10116,12 +10162,12 @@ function Compkiller:KeySystem(validKeys)
 	
 	-- Button hover effects
 	SubmitBtn.MouseEnter:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 25, 35)}):Play()
-		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(28, 35, 48)}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
 	end)
 	SubmitBtn.MouseLeave:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(12, 15, 20)}):Play()
-		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(18, 22, 30)}):Play()
+		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
 	end)
 	
 	-- Input focus effects
@@ -10188,7 +10234,12 @@ function Compkiller:KeySystem(validKeys)
 	
 	-- Wait for key verification before continuing
 	repeat task.wait(0.1) until not KeySystemActive
+	
+	-- Return expiry information
+	return {
+		Duration = duration,
+		ExpiryDate = ExpiryDate
+	}
 end
 
 return Compkiller;
-
