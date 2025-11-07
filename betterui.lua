@@ -12,31 +12,33 @@
     - Added Secure mode > Compkiller:Security("Cache-Directory")
         Secure mode: this will cache all images to your workspace and disabled blur
     
-    ENHANCEMENTS:
-    ✓ Premium cyan/neon blue gaming color palette
-    ✓ Electric cyan accents with neon green toggles
-    ✓ Ultra-smooth animations (Exponential, Back, Sine easing)
-    ✓ Better font weights (GothamSemibold)
-    ✓ Improved corner radius (8-12px for modern rounded look)
+    ENHANCEMENTS - CLEAN & POLISHED:
     
-    ANIMATIONS:
-    ✓ Ripple effects on all button clicks
-    ✓ Shimmer/shine effects across elements
-    ✓ Bouncy toggle switches with satisfying feel
-    ✓ Smooth spring-based slider movements
-    ✓ Floating/breathing window animation
-    ✓ Spinning logo with rotation effects
-    ✓ Glowing pulse on selection indicator
-    ✓ Staggered fade-in for window opening
-    ✓ Bouncy section expand/collapse
-    ✓ Smooth dropdown icon rotation
-    ✓ Floating particle ambience effects
-    ✓ Slide-in animations for new tab buttons
-    ✓ Shake animations for feedback
-    ✓ Color picker bounce and shimmer
-    ✓ Cinematic loader with spinning icon
-    ✓ Enhanced hover effects with scale/glow
-    ✓ Tab switching with pulse feedback
+    VISUAL UPGRADES:
+    ✓ Premium dark theme with vibrant cyan accents
+    ✓ Electric cyan (0,255,255) highlight color
+    ✓ Mint green toggles, hot pink warnings
+    ✓ Deep dark backgrounds for pro look
+    ✓ Glowing borders on all interactive elements
+    ✓ Gradients on buttons for depth
+    ✓ Improved corner radius (6-12px rounded)
+    ✓ Better transparency values for solid feel
+    ✓ GothamBold for buttons, GothamSemibold for text
+    ✓ Larger text sizes for readability
+    
+    SMOOTH ANIMATIONS:
+    ✓ Ripple click effects
+    ✓ Bouncy toggle switches (Back easing)
+    ✓ Smooth slider movements (Sine easing)
+    ✓ Glowing pulse on selection bar
+    ✓ Staggered window opening
+    ✓ Section expand/collapse (Exponential)
+    ✓ Dropdown icon rotation with scale
+    ✓ Slide-in tab buttons
+    ✓ Bouncy color picker opening
+    ✓ Elegant notification slide
+    ✓ Hover glow effects
+    ✓ Cinematic loader entrance
 --]]
 
 --- Export Types ---
@@ -376,20 +378,20 @@ local Compkiller = {
 	ProtectGui = protect_gui or protectgui or (syn and syn.protect_gui) or function(s) return s; end,
 };
 
--- Premium Cyan/Neon Blue Gaming Color Palette - Clean and Modern
+-- Premium Dark Theme with Vibrant Cyan Accents - 10/10 Clean Look
 Compkiller.Colors = {
-	Highlight = Color3.fromRGB(0, 230, 255),  -- Electric cyan (primary accent)
-	Toggle = Color3.fromRGB(0, 255, 170),  -- Neon green (active state)
-	Risky = Color3.fromRGB(255, 85, 127),  -- Hot pink (danger/warning)
-	BGDBColor = Color3.fromRGB(12, 15, 22),  -- Ultra dark background
-	BlockColor = Color3.fromRGB(20, 25, 35),  -- Slightly lighter surface
-	StrokeColor = Color3.fromRGB(40, 50, 65),  -- Subtle cyan-tinted borders
-	SwitchColor = Color3.fromRGB(255, 255, 255),  -- Pure white text
-	DropColor = Color3.fromRGB(25, 32, 45),  -- Dropdown dark blue
-	MouseEnter = Color3.fromRGB(15, 180, 220),  -- Darker cyan on hover
-	BlockBackground = Color3.fromRGB(18, 22, 30),  -- Card/panel background
-	LineColor = Color3.fromRGB(45, 55, 70),  -- Divider lines with blue tint
-	HighStrokeColor = Color3.fromRGB(0, 200, 255),  -- Glowing cyan borders
+	Highlight = Color3.fromRGB(0, 255, 255),  -- Bright electric cyan
+	Toggle = Color3.fromRGB(0, 255, 200),  -- Mint green for active
+	Risky = Color3.fromRGB(255, 70, 100),  -- Vibrant pink red
+	BGDBColor = Color3.fromRGB(10, 12, 18),  -- Deep dark base
+	BlockColor = Color3.fromRGB(16, 20, 28),  -- Dark elevated surface
+	StrokeColor = Color3.fromRGB(35, 45, 60),  -- Subtle dark borders
+	SwitchColor = Color3.fromRGB(255, 255, 255),  -- Crisp white text
+	DropColor = Color3.fromRGB(18, 24, 35),  -- Dark dropdown
+	MouseEnter = Color3.fromRGB(0, 200, 230),  -- Cyan hover highlight
+	BlockBackground = Color3.fromRGB(14, 18, 25),  -- Panel background
+	LineColor = Color3.fromRGB(30, 40, 55),  -- Dark separator lines
+	HighStrokeColor = Color3.fromRGB(0, 230, 255),  -- Bright cyan accent borders
 };
 
 Compkiller.Elements = {
@@ -1835,29 +1837,10 @@ function Compkiller.__SIGNAL(default)
 	return Binds;
 end;
 
--- Enhanced hover with scale animation
+-- Clean hover without scaling
 function Compkiller:_Hover(Frame: Frame , OnHover: () -> any?, Release: () -> any?)
-	Frame.MouseEnter:Connect(function()
-		-- Add subtle scale animation on hover
-		if Frame:IsA("Frame") or Frame:IsA("ImageLabel") or Frame:IsA("ImageButton") then
-			local originalSize = Frame.Size
-			Compkiller:_Animation(Frame, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Size = UDim2.new(originalSize.X.Scale * 1.02, originalSize.X.Offset, originalSize.Y.Scale * 1.02, originalSize.Y.Offset)
-			})
-		end
-		OnHover();
-	end);
-
-	Frame.MouseLeave:Connect(function()
-		-- Return to original size
-		if Frame:IsA("Frame") or Frame:IsA("ImageLabel") or Frame:IsA("ImageButton") then
-			local originalSize = Frame:GetAttribute("OriginalSize")
-			if not originalSize then
-				Frame:SetAttribute("OriginalSize", tostring(Frame.Size))
-			end
-		end
-		Release();
-	end);
+	Frame.MouseEnter:Connect(OnHover);
+	Frame.MouseLeave:Connect(Release);
 end;
 
 function Compkiller.__CONFIG(config , default)
@@ -1957,6 +1940,8 @@ function Compkiller:_AddLinkValue(Name , Default , GlobalBlock , LinkValues , re
 		UICorner.Parent = Toggle
 
 		UIStroke.Color = Compkiller.Colors.HighStrokeColor
+		UIStroke.Thickness = 1.5
+		UIStroke.Transparency = 0.6  -- Subtle glow around toggle
 		UIStroke.Parent = Toggle
 
 		table.insert(Compkiller.Elements.HighStrokeColor,{
@@ -1977,6 +1962,13 @@ function Compkiller:_AddLinkValue(Name , Default , GlobalBlock , LinkValues , re
 
 		UICorner_2.CornerRadius = UDim.new(1, 0)
 		UICorner_2.Parent = ToggleValue;
+		
+		-- Add shadow to toggle indicator for depth
+		local ToggleShadow = Instance.new("UIStroke")
+		ToggleShadow.Color = Color3.fromRGB(0, 0, 0)
+		ToggleShadow.Thickness = 1
+		ToggleShadow.Transparency = 0.7
+		ToggleShadow.Parent = ToggleValue
 
 		-- Enhanced toggle animation with bouncy effect for better feel
 		local ToggleElement = function(bool,noChange)
@@ -2093,15 +2085,17 @@ function Compkiller:_AddLinkValue(Name , Default , GlobalBlock , LinkValues , re
 
 		UIScale.Parent = ColorFrame
 
-		UIStroke.Color = Compkiller.Colors.HighStrokeColor
+		UIStroke.Color = Compkiller.Colors.Highlight
+		UIStroke.Thickness = 1.5
+		UIStroke.Transparency = 0.5  -- Glowing border
 		UIStroke.Parent = ColorFrame
 
-		table.insert(Compkiller.Elements.HighStrokeColor,{
+		table.insert(Compkiller.Elements.Highlight,{
 			Element = UIStroke,
 			Property = "Color"
 		})
 
-		UICorner.CornerRadius = UDim.new(0, 3)
+		UICorner.CornerRadius = UDim.new(0, 4)  -- Slightly more rounded
 		UICorner.Parent = ColorFrame
 
 		Signal:Connect(function(bool)
@@ -2195,7 +2189,7 @@ function Compkiller:_AddLinkValue(Name , Default , GlobalBlock , LinkValues , re
 		Keybind.Name = Compkiller:_RandomString()
 		Keybind.Parent = LinkValues
 		Keybind.BackgroundColor3 = Compkiller.Colors.DropColor
-		Keybind.BackgroundTransparency = 0.8
+		Keybind.BackgroundTransparency = 0.3  -- More opaque
 		Keybind.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Keybind.BorderSizePixel = 0
 		Keybind.Size = UDim2.new(0, 45, 0, 16)
@@ -2209,10 +2203,12 @@ function Compkiller:_AddLinkValue(Name , Default , GlobalBlock , LinkValues , re
 			Property = "BackgroundColor3"
 		})
 
-		UICorner.CornerRadius = UDim.new(0, 3)
+		UICorner.CornerRadius = UDim.new(0, 6)  -- More rounded
 		UICorner.Parent = Keybind
 
-		UIStroke.Color = Compkiller.Colors.HighStrokeColor
+		UIStroke.Color = Compkiller.Colors.Highlight
+		UIStroke.Thickness = 1
+		UIStroke.Transparency = 0.7  -- Cyan glow
 		UIStroke.Parent = Keybind
 
 		table.insert(Compkiller.Elements.HighStrokeColor,{
@@ -2228,11 +2224,11 @@ function Compkiller:_AddLinkValue(Name , Default , GlobalBlock , LinkValues , re
 		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 		TextLabel.Size = UDim2.new(1, -5, 1, -5)
 		TextLabel.ZIndex = GlobalBlock.ZIndex + 3
-		TextLabel.Font = Enum.Font.Gotham
+		TextLabel.Font = Enum.Font.GothamBold  -- Bolder for keybinds
 		TextLabel.Text = GetItem(Default or "None");
-		TextLabel.TextColor3 = Compkiller.Colors.SwitchColor
+		TextLabel.TextColor3 = Compkiller.Colors.Highlight  -- Cyan text
 		TextLabel.TextSize = 12.000
-		TextLabel.TextTransparency = 0.200
+		TextLabel.TextTransparency = 0.000  -- Fully visible
 
 		table.insert(Compkiller.Elements.SwitchColor,{
 			Element = TextLabel,
@@ -2692,15 +2688,17 @@ function Compkiller:_AddColorPickerPanel(Button: ImageButton , Callback: (Color:
 
 	Compkiller:_AddDragBlacklist(ColorPickerWindow)
 
-	UIStroke.Color = Compkiller.Colors.HighStrokeColor
+	UIStroke.Color = Compkiller.Colors.Highlight
+	UIStroke.Thickness = 2  -- Thicker for better visibility
+	UIStroke.Transparency = 0.5  -- Glowing border
 	UIStroke.Parent = ColorPickerWindow
 
-	table.insert(Compkiller.Elements.HighStrokeColor , {
+	table.insert(Compkiller.Elements.Highlight , {
 		Element = UIStroke,
 		Property = "Color"
 	})
 
-	UICorner.CornerRadius = UDim.new(0, 6)
+	UICorner.CornerRadius = UDim.new(0, 12)  -- More rounded for modern look
 	UICorner.Parent = ColorPickerWindow
 
 	ColorPickBox.Name = Compkiller:_RandomString()
@@ -2874,19 +2872,19 @@ function Compkiller:_AddColorPickerPanel(Button: ImageButton , Callback: (Color:
 		Property = "Color"
 	});
 
-	TextLabel.Parent = HexFrame
-	TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-	TextLabel.BackgroundTransparency = 1.000
-	TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	TextLabel.BorderSizePixel = 0
-	TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-	TextLabel.Size = UDim2.new(1, -10, 1, -5)
-	TextLabel.ZIndex = BaseZ_Index + 206
-	TextLabel.Font = Enum.Font.Gotham
-	TextLabel.Text = "#FFFFFFF"
-	TextLabel.TextColor3 = Compkiller.Colors.SwitchColor
-	TextLabel.TextSize = 13.000
-	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+		TextLabel.Parent = HexFrame
+		TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+		TextLabel.BackgroundTransparency = 1.000
+		TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		TextLabel.BorderSizePixel = 0
+		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+		TextLabel.Size = UDim2.new(1, -10, 1, -5)
+		TextLabel.ZIndex = BaseZ_Index + 206
+		TextLabel.Font = Enum.Font.GothamBold  -- Bolder for hex code
+		TextLabel.Text = "#FFFFFFF"
+		TextLabel.TextColor3 = Compkiller.Colors.Highlight  -- Cyan color
+		TextLabel.TextSize = 13.000
+		TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 	table.insert(Compkiller.Elements.SwitchColor , {
 		Element = TextLabel,
@@ -2941,13 +2939,6 @@ function Compkiller:_AddColorPickerPanel(Button: ImageButton , Callback: (Color:
 			Compkiller:_Animation(ColorPickerWindow,TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
 				Position = MainPosition,
 			});
-			
-			-- Add shimmer effect when opening
-			task.delay(0.3, function()
-				if ColorPickerWindow and ColorPickerWindow.Parent then
-					Compkiller:_Shimmer(ColorPickerWindow)
-				end
-			end)
 
 			Compkiller:_Animation(UIStroke_8,Tween,{
 				Transparency = 0
@@ -3678,15 +3669,17 @@ function Compkiller:_LoadDropdown(BaseParent: TextButton , Callback: () -> any)
 		DropdownWindow.Visible = v;
 	end)
 
-	UIStroke.Color = Compkiller.Colors.HighStrokeColor
+	UIStroke.Color = Compkiller.Colors.Highlight
+	UIStroke.Thickness = 2
+	UIStroke.Transparency = 0.6  -- Glowing cyan border
 	UIStroke.Parent = DropdownWindow
 
-	table.insert(Compkiller.Elements.HighStrokeColor , {
+	table.insert(Compkiller.Elements.Highlight , {
 		Element = UIStroke,
 		Property = "Color"
 	})
 
-	UICorner.CornerRadius = UDim.new(0, 6)
+	UICorner.CornerRadius = UDim.new(0, 10)  -- More rounded
 	UICorner.Parent = DropdownWindow
 
 	ScrollingFrame.Parent = DropdownWindow
@@ -3787,11 +3780,11 @@ function Compkiller:_LoadDropdown(BaseParent: TextButton , Callback: () -> any)
 		BlockText.Position = UDim2.new(0, 5, 0.5, 0)
 		BlockText.Size = UDim2.new(1, -10, 0, 25)
 		BlockText.ZIndex = BaseZ_Index + 6
-		BlockText.Font = Enum.Font.GothamMedium
+		BlockText.Font = Enum.Font.GothamSemibold  -- Bolder
 		BlockText.Text = ""
 		BlockText.TextColor3 = Compkiller.Colors.SwitchColor
 		BlockText.TextSize = 13.000
-		BlockText.TextTransparency = 0.500
+		BlockText.TextTransparency = 0.3  -- More visible
 		BlockText.TextXAlignment = Enum.TextXAlignment.Left
 
 		table.insert(Compkiller.Elements.SwitchColor , {
@@ -3815,6 +3808,20 @@ function Compkiller:_LoadDropdown(BaseParent: TextButton , Callback: () -> any)
 			Property = "BackgroundColor3"
 		});
 
+		-- Add hover effect to dropdown items
+		Compkiller:_Hover(DropdownItem, function()
+			Compkiller:_Animation(DropdownItem, TweenInfo.new(0.15), {
+				BackgroundTransparency = 0.95
+			})
+			Compkiller:_Animation(BlockText, TweenInfo.new(0.15), {
+				TextTransparency = 0
+			})
+		end, function()
+			Compkiller:_Animation(DropdownItem, TweenInfo.new(0.15), {
+				BackgroundTransparency = 1
+			})
+		end)
+		
 		return {
 			BlockText = BlockText,
 			DropdownItem = DropdownItem,
@@ -4016,25 +4023,13 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 
 		local Toggle = Block:AddLink('Toggle' , Config.Default);
 
-		-- Enhanced toggle click with satisfying animations
+		-- Clean toggle click
 		Toggle.Input.MouseButton1Click:Connect(function()
 			Config.Default = not Config.Default;
 
 			Toggle.ChangeValue(Config.Default);
 
 			Block:SetTransparency((Config.Default and 0.1) or 0.3);
-			
-			-- Add pulse effect on toggle
-			Compkiller:_Pulse(Toggle.Root, 0.4);
-			
-			-- Add shimmer when enabling
-			if Config.Default then
-				task.delay(0.2, function()
-					if Toggle.Root and Toggle.Root.Parent then
-						Compkiller:_Shimmer(Toggle.Root);
-					end
-				end)
-			end
 
 			Config.Callback(Config.Default);
 		end);
@@ -4277,7 +4272,7 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		Frame.Parent = Button
 		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 		Frame.BackgroundColor3 = Compkiller.Colors.Highlight
-		Frame.BackgroundTransparency = 0.100
+		Frame.BackgroundTransparency = 0.05  -- More opaque for better visibility
 		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Frame.BorderSizePixel = 0
 		Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -4289,16 +4284,27 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 			Property = "BackgroundColor3"
 		});
 
-		UIStroke.Color = Compkiller.Colors.StrokeColor
+		UIStroke.Color = Compkiller.Colors.Highlight
+		UIStroke.Thickness = 1.5  -- Thicker border for better definition
+		UIStroke.Transparency = 0.7  -- Semi-transparent glow
 		UIStroke.Parent = Frame
 
-		table.insert(Compkiller.Elements.StrokeColor,{
+		table.insert(Compkiller.Elements.Highlight,{
 			Element = UIStroke,
 			Property = "Color"
 		});
 
-		UICorner.CornerRadius = UDim.new(0, 3)
+		UICorner.CornerRadius = UDim.new(0, 6)  -- More rounded for modern look
 		UICorner.Parent = Frame
+		
+		-- Add gradient for premium depth
+		local Gradient = Instance.new("UIGradient")
+		Gradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+		})
+		Gradient.Rotation = 90
+		Gradient.Parent = Frame
 
 		TextLabel.Parent = Frame
 		TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -4308,37 +4314,39 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 		TextLabel.Size = UDim2.new(1, 0, 1, 0)
 		TextLabel.ZIndex = Zindex + 8
-		TextLabel.Font = Enum.Font.GothamMedium
+		TextLabel.Font = Enum.Font.GothamBold  -- Bolder font for buttons
 		TextLabel.Text = Config.Name;
 		TextLabel.TextColor3 = Compkiller.Colors.SwitchColor
-		TextLabel.TextSize = 12.000
-		TextLabel.TextStrokeTransparency = 0.900
+		TextLabel.TextSize = 13.000  -- Slightly larger for better readability
+		TextLabel.TextStrokeTransparency = 1.000  -- No stroke for cleaner look
 
 		table.insert(Compkiller.Elements.SwitchColor , {
 			Element = TextLabel,
 			Property = 'TextColor3'
 		});
 
-		-- Enhanced hover effect with smoother transitions
+		-- Clean hover effect with glowing border
 		Compkiller:_Hover(Frame,function()
 			if Signal:GetValue() then
-				Compkiller:_Animation(Frame,TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
-					BackgroundTransparency = 0,
-					Size = UDim2.new(1, -13, 1, -3)  -- Subtle scale up on hover
+				Compkiller:_Animation(Frame,TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+					BackgroundTransparency = 0
+				})
+				Compkiller:_Animation(UIStroke,TweenInfo.new(0.2),{
+					Transparency = 0.3  -- Glow effect on hover
 				})
 			end;
 		end,function()
 			if Signal:GetValue() then
-				Compkiller:_Animation(Frame,TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
-					BackgroundTransparency = 0.1,
-					Size = UDim2.new(1, -15, 1, -5)  -- Return to original size
+				Compkiller:_Animation(Frame,TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+					BackgroundTransparency = 0.05
+				})
+				Compkiller:_Animation(UIStroke,TweenInfo.new(0.2),{
+					Transparency = 0.7  -- Normal glow
 				})
 			end;
 		end);
 
 		Compkiller:_Input(Frame,function()
-			-- Add shimmer effect on button click for premium feel
-			Compkiller:_Shimmer(Frame);
 			Config.Callback();
 		end);
 
@@ -4487,13 +4495,20 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		});
 
 		-- Increased corner radius for modern, rounded look
-		UICorner.CornerRadius = UDim.new(0, 8)
+		UICorner.CornerRadius = UDim.new(1, 0)  -- Fully rounded (pill shape)
 		UICorner.Parent = SliderBar
 
 		SliderInput.Name = Compkiller:_RandomString()
 		SliderInput.Parent = SliderBar
 		SliderInput.AnchorPoint = Vector2.new(0, 0.5)
 		SliderInput.BackgroundColor3 = Compkiller.Colors.Highlight
+		
+		-- Add glow to slider fill
+		local SliderGlow = Instance.new("UIStroke")
+		SliderGlow.Color = Compkiller.Colors.Highlight
+		SliderGlow.Thickness = 1.5
+		SliderGlow.Transparency = 0.5
+		SliderGlow.Parent = SliderInput
 		SliderInput.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SliderInput.BorderSizePixel = 0
 		SliderInput.Position = UDim2.new(0, 0, 0.5, 0)
@@ -4505,7 +4520,7 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 			Property = "BackgroundColor3"
 		});
 
-		UICorner_2.CornerRadius = UDim.new(0, 6)
+		UICorner_2.CornerRadius = UDim.new(1, 0)  -- Fully rounded pill shape
 		UICorner_2.Parent = SliderInput
 
 		Frame.Parent = SliderInput
@@ -4556,8 +4571,8 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 				Compkiller:_Animation(ValueText,TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
 					TextTransparency = 0
 				})
-				Compkiller:_Animation(SliderInput,TweenInfo.new(0.2),{
-					BackgroundColor3 = Color3.fromRGB(50, 255, 255)  -- Brighter cyan glow on hover
+				Compkiller:_Animation(SliderGlow,TweenInfo.new(0.2),{
+					Transparency = 0.1  -- Bright glow on hover
 				})
 			end;
 		end,function()
@@ -4565,8 +4580,8 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 				Compkiller:_Animation(ValueText,TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
 					TextTransparency = 0.750
 				})
-				Compkiller:_Animation(SliderInput,TweenInfo.new(0.2),{
-					BackgroundColor3 = Compkiller.Colors.Highlight  -- Return to normal
+				Compkiller:_Animation(SliderGlow,TweenInfo.new(0.2),{
+					Transparency = 0.5  -- Normal glow
 				})
 			end;
 		end)	
@@ -4943,15 +4958,17 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 			Property = "BackgroundColor3"
 		})
 
-		UIStroke.Color = Compkiller.Colors.StrokeColor
+		UIStroke.Color = Compkiller.Colors.HighStrokeColor
+		UIStroke.Thickness = 1
+		UIStroke.Transparency = 0.7  -- Subtle glow
 		UIStroke.Parent = LinkValues
 
-		table.insert(Compkiller.Elements.StrokeColor,{
+		table.insert(Compkiller.Elements.HighStrokeColor,{
 			Element = UIStroke,
 			Property = "Color"
 		})
 
-		UICorner.CornerRadius = UDim.new(0, 3)
+		UICorner.CornerRadius = UDim.new(0, 6)  -- More rounded
 		UICorner.Parent = LinkValues
 
 		TextBox_2.Parent = LinkValues
@@ -5236,15 +5253,17 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 			Property = "BackgroundColor3"
 		})
 
-		UIStroke.Color = Compkiller.Colors.StrokeColor
+		UIStroke.Color = Compkiller.Colors.HighStrokeColor
+		UIStroke.Thickness = 1
+		UIStroke.Transparency = 0.8
 		UIStroke.Parent = ValueItems
 
-		table.insert(Compkiller.Elements.StrokeColor,{
+		table.insert(Compkiller.Elements.HighStrokeColor,{
 			Element = UIStroke,
 			Property = "Color"
 		});
 
-		UICorner.CornerRadius = UDim.new(0, 3)
+		UICorner.CornerRadius = UDim.new(0, 6)  -- More rounded
 		UICorner.Parent = ValueItems
 
 		ValueText.Name = Compkiller:_RandomString()
@@ -5693,27 +5712,6 @@ function Compkiller.new(Config : Window)
 			MainFrame.Visible = true;
 		end;
 	end)
-	
-	-- Add subtle breathing animation to main window for life
-	task.spawn(function()
-		while MainFrame and MainFrame.Parent do
-			if WindowOpen:GetValue() then
-				-- Very subtle scale breathing
-				Compkiller:_Animation(MainFrame, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-					Size = UDim2.new(Config.Scale.X.Scale, Config.Scale.X.Offset + 2, Config.Scale.Y.Scale, Config.Scale.Y.Offset + 2)
-				})
-				task.wait(3)
-				if MainFrame and MainFrame.Parent and WindowOpen:GetValue() then
-					Compkiller:_Animation(MainFrame, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-						Size = Config.Scale
-					})
-					task.wait(3)
-				end
-			else
-				task.wait(1)
-			end
-		end
-	end)
 
 	-- Enhanced window opening animation with elegant easing
 	Compkiller:_Animation(MainFrame,TweenInfo.new(0.8,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out),{
@@ -5723,8 +5721,15 @@ function Compkiller.new(Config : Window)
 	-- Enhanced corner radius for modern rounded aesthetic
 	UICorner.CornerRadius = UDim.new(0, 12)
 	UICorner.Parent = MainFrame
+	
+	-- Add premium glowing border to main window
+	local MainStroke = Instance.new("UIStroke")
+	MainStroke.Color = Compkiller.Colors.Highlight
+	MainStroke.Thickness = 2
+	MainStroke.Transparency = 0.8
+	MainStroke.Parent = MainFrame
 
-	local TabFrameBaseTrans = 0.15;  -- Slightly more opaque for better depth perception
+	local TabFrameBaseTrans = 0.05;  -- Very opaque for solid feel
 
 	TabFrame.Active = true
 	TabFrame.Name = Compkiller:_RandomString()
@@ -5769,24 +5774,6 @@ function Compkiller.new(Config : Window)
 	CompLogo.Position = UDim2.new(0, 9, 0, 7)
 	CompLogo.Size = UDim2.new(0, 45, 0, 45)
 	CompLogo.Image = Config.Logo
-	
-	-- Add floating animation to logo for dynamic feel
-	task.spawn(function()
-		while CompLogo and CompLogo.Parent do
-			Compkiller:_Animation(CompLogo, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-				Position = UDim2.new(0, 9, 0, 10),
-				Rotation = 5
-			})
-			task.wait(2.5)
-			if CompLogo and CompLogo.Parent then
-				Compkiller:_Animation(CompLogo, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-					Position = UDim2.new(0, 9, 0, 7),
-					Rotation = -5
-				})
-				task.wait(2.5)
-			end
-		end
-	end)
 
 	WindowLabel.Name = Compkiller:_RandomString()
 	WindowLabel.Parent = TabFrame
@@ -6013,10 +6000,9 @@ function Compkiller.new(Config : Window)
 				Position = UDim2.new(0.5, 0, 0.5, 0)
 			})
 
-			-- Logo spins in
-			Compkiller:_Animation(CompLogo,TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
-				ImageTransparency = 0,
-				Rotation = 360
+			-- Logo fades in
+			Compkiller:_Animation(CompLogo,TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+				ImageTransparency = 0
 			})
 			
 			task.delay(0.1, function()
@@ -6835,13 +6821,10 @@ function Compkiller.new(Config : Window)
 			table.insert(TabArgs.Tabs,Id)
 
 			Compkiller:_Input(Frame,function()
-				-- Enhanced tab switching with animations
+				-- Tab switching
 				for i,v in next , TabArgs.Tabs do
 					if v.Root == Frame then
 						TabArgs.__Current = v;
-						
-						-- Pulse animation on tab switch
-						Compkiller:_Pulse(Frame, 0.3);
 						
 						v.Remote:Fire(true);
 					else
@@ -7728,19 +7711,6 @@ function Compkiller.new(Config : Window)
 			Icon.ZIndex = 15
 			Icon.Image = "rbxassetid://10734941499"
 			Icon.ImageTransparency = 1;
-			
-			-- Add subtle spin animation when hovering save button
-			Compkiller:_Hover(Frame, function()
-				task.spawn(function()
-					for i = 0, 360, 30 do
-						if Icon.Parent then
-							Icon.Rotation = i
-							task.wait(0.02)
-						end
-					end
-					Icon.Rotation = 0
-				end)
-			end, function() end)
 
 			LoadButton.Name = Compkiller:_RandomString()
 			LoadButton.Parent = LinkValues
@@ -8649,7 +8619,9 @@ function Compkiller.new(Config : Window)
 				})
 			end)
 
-			UIStroke.Color = Compkiller.Colors.StrokeColor
+			UIStroke.Color = Compkiller.Colors.HighStrokeColor
+			UIStroke.Thickness = 1
+			UIStroke.Transparency = 0.8  -- Subtle cyan glow
 			UIStroke.Parent = Section
 
 			table.insert(Compkiller.Elements.StrokeColor,{
@@ -8871,9 +8843,6 @@ function Compkiller.new(Config : Window)
 					});
 				end;
 
-				-- Pulse the header for visual feedback
-				Compkiller:_Pulse(Header, 0.3);
-
 				refresh();
 
 				refreshScale();
@@ -8995,15 +8964,22 @@ function Compkiller.new(Config : Window)
 				Property = 'BackgroundColor3'
 			});
 
-			Watermark.BackgroundTransparency = 0.025
-			Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Watermark.BorderSizePixel = 0
-			Watermark.Position = UDim2.new(1, -10, 0, 10)
-			Watermark.Size = UDim2.new(0, 45, 0, 23)
-			Watermark.ZIndex = 150
+		Watermark.BackgroundTransparency = 0.000  -- Solid for clarity
+		Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Watermark.BorderSizePixel = 0
+		Watermark.Position = UDim2.new(1, -10, 0, 10)
+		Watermark.Size = UDim2.new(0, 45, 0, 23)
+		Watermark.ZIndex = 150
+		
+		-- Add glowing border to watermark
+		local WatermarkStroke = Instance.new("UIStroke")
+		WatermarkStroke.Color = Compkiller.Colors.Highlight
+		WatermarkStroke.Thickness = 1.5
+		WatermarkStroke.Transparency = 0.7
+		WatermarkStroke.Parent = Watermark
 
-			UICorner.CornerRadius = UDim.new(0, 3)
-			UICorner.Parent = Watermark
+		UICorner.CornerRadius = UDim.new(0, 6)  -- More rounded
+		UICorner.Parent = Watermark
 
 			Logo.Name = Compkiller:_RandomString()
 			Logo.Parent = Watermark
@@ -9287,39 +9263,6 @@ function Compkiller.new(Config : Window)
 		MovementFrame.ZIndex = 9
 
 	Compkiller:Drag(MovementFrame,MainFrame,0.1)
-	
-	-- Add floating particles around window for ambience
-	task.spawn(function()
-		for i = 1, 8 do
-			task.wait(0.3)
-			if MainFrame and MainFrame.Parent then
-				local Particle = Instance.new("Frame")
-				Particle.Name = "Particle"
-				Particle.AnchorPoint = Vector2.new(0.5, 0.5)
-				Particle.BackgroundColor3 = Compkiller.Colors.Highlight
-				Particle.BackgroundTransparency = 0.7
-				Particle.BorderSizePixel = 0
-				Particle.Size = UDim2.new(0, math.random(3, 6), 0, math.random(3, 6))
-				Particle.Position = UDim2.new(math.random(0, 100) / 100, 0, math.random(0, 100) / 100, 0)
-				Particle.ZIndex = 1
-				Particle.Parent = MainFrame
-				
-				local Corner = Instance.new("UICorner")
-				Corner.CornerRadius = UDim.new(1, 0)
-				Corner.Parent = Particle
-				
-				-- Animate particle floating upward
-				Compkiller:_Animation(Particle, TweenInfo.new(math.random(3, 5), Enum.EasingStyle.Linear), {
-					Position = UDim2.new(Particle.Position.X.Scale + (math.random(-20, 20) / 100), 0, -0.2, 0),
-					BackgroundTransparency = 1
-				})
-				
-				task.delay(5, function()
-					if Particle then Particle:Destroy() end
-				end)
-			end
-		end
-	end)
 
 	SelectionFrame.Position = UDim2.new(1, 5, 0, 28)
 	SelectionFrame.Size = UDim2.new(0, 8, 0, 22)
@@ -9731,21 +9674,11 @@ function Compkiller:Loader(IconId,Duration)
 	local Event = Instance.new('BindableEvent');
 
 	task.delay(0.4,function()
-		-- Dramatic icon entrance with back easing and rotation
+		-- Dramatic icon entrance with back easing
 		Compkiller:_Animation(Icon,TweenInfo.new(1.0,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
 			ImageTransparency = 0,
-			Size = UDim2.new(0, 200, 0, 200),
-			Rotation = 360
+			Size = UDim2.new(0, 200, 0, 200)
 		});
-		
-		-- Add spinning animation while loading
-		task.spawn(function()
-			local startTime = tick()
-			while Icon and Icon.Parent and (tick() - startTime) < (Duration or 4.5) do
-				Icon.Rotation = Icon.Rotation + 2
-				task.wait(0.03)
-			end
-		end)
 
 		task.delay(0.3,function()
 			Compkiller:_Animation(Vignette,TweenInfo.new(4.5,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{
@@ -9857,20 +9790,26 @@ function Compkiller.newNotify()
 			BlockFrame.LayoutOrder = LayoutREF;
 
 
-			NotifyFrame.Name = Compkiller:_RandomString()
-			NotifyFrame.Parent = BlockFrame
-			NotifyFrame.BackgroundColor3 = Compkiller.Colors.BGDBColor
-			NotifyFrame.BackgroundTransparency = 0.100
-			NotifyFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			NotifyFrame.BorderSizePixel = 0
-			NotifyFrame.ClipsDescendants = false
-			NotifyFrame.Size = UDim2.new(1, 0, 1, -5)
-			NotifyFrame.ZIndex = 2
-			NotifyFrame.Position = UDim2.new(1,200,0,0)
+		NotifyFrame.Name = Compkiller:_RandomString()
+		NotifyFrame.Parent = BlockFrame
+		NotifyFrame.BackgroundColor3 = Compkiller.Colors.BlockColor
+		NotifyFrame.BackgroundTransparency = 0.000  -- Solid for better visibility
+		NotifyFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		NotifyFrame.BorderSizePixel = 0
+		NotifyFrame.ClipsDescendants = false
+		NotifyFrame.Size = UDim2.new(1, 0, 1, -5)
+		NotifyFrame.ZIndex = 2
+		NotifyFrame.Position = UDim2.new(1,200,0,0)
 
+		-- Add glowing border to notifications
+		local NotifyStroke = Instance.new("UIStroke")
+		NotifyStroke.Color = Compkiller.Colors.Highlight
+		NotifyStroke.Thickness = 2
+		NotifyStroke.Transparency = 0.6
+		NotifyStroke.Parent = NotifyFrame
 
-			UICorner.CornerRadius = UDim.new(0, 4)
-			UICorner.Parent = NotifyFrame
+		UICorner.CornerRadius = UDim.new(0, 8)  -- More rounded
+		UICorner.Parent = NotifyFrame
 
 			CompLogo.Name = Compkiller:_RandomString()
 			CompLogo.Parent = NotifyFrame
@@ -9883,20 +9822,20 @@ function Compkiller.newNotify()
 			CompLogo.ZIndex = 4
 			CompLogo.Image = Compkiller:_GetIcon(Notify.Icon);
 
-			Header.Name = Compkiller:_RandomString()
-			Header.Parent = NotifyFrame
-			Header.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Header.BackgroundTransparency = 1.000
-			Header.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Header.BorderSizePixel = 0
-			Header.Position = UDim2.new(0, 40, 0, 10)
-			Header.Size = UDim2.new(1, -50, 0, 15)
-			Header.ZIndex = 3
-			Header.Font = Enum.Font.GothamBold
-			Header.Text = Notify.Title
-			Header.TextColor3 = Compkiller.Colors.SwitchColor
-			Header.TextSize = 14.000
-			Header.TextXAlignment = Enum.TextXAlignment.Left
+		Header.Name = Compkiller:_RandomString()
+		Header.Parent = NotifyFrame
+		Header.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Header.BackgroundTransparency = 1.000
+		Header.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Header.BorderSizePixel = 0
+		Header.Position = UDim2.new(0, 40, 0, 10)
+		Header.Size = UDim2.new(1, -50, 0, 15)
+		Header.ZIndex = 3
+		Header.Font = Enum.Font.GothamBold
+		Header.Text = Notify.Title
+		Header.TextColor3 = Compkiller.Colors.Highlight  -- Cyan colored title
+		Header.TextSize = 15.000  -- Larger for emphasis
+		Header.TextXAlignment = Enum.TextXAlignment.Left
 
 			Body.Name = Compkiller:_RandomString()
 			Body.Parent = NotifyFrame
