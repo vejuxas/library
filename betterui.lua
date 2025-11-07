@@ -18,11 +18,25 @@
     ✓ Ultra-smooth animations (Exponential, Back, Sine easing)
     ✓ Better font weights (GothamSemibold)
     ✓ Improved corner radius (8-12px for modern rounded look)
-    ✓ Enhanced hover effects with glow and scale transitions
-    ✓ Bouncy toggle animations for satisfying feel
-    ✓ Spring-based slider movements
-    ✓ Cinematic loader animations with dramatic effects
-    ✓ Better visual feedback on all interactions
+    
+    ANIMATIONS:
+    ✓ Ripple effects on all button clicks
+    ✓ Shimmer/shine effects across elements
+    ✓ Bouncy toggle switches with satisfying feel
+    ✓ Smooth spring-based slider movements
+    ✓ Floating/breathing window animation
+    ✓ Spinning logo with rotation effects
+    ✓ Glowing pulse on selection indicator
+    ✓ Staggered fade-in for window opening
+    ✓ Bouncy section expand/collapse
+    ✓ Smooth dropdown icon rotation
+    ✓ Floating particle ambience effects
+    ✓ Slide-in animations for new tab buttons
+    ✓ Shake animations for feedback
+    ✓ Color picker bounce and shimmer
+    ✓ Cinematic loader with spinning icon
+    ✓ Enhanced hover effects with scale/glow
+    ✓ Tab switching with pulse feedback
 --]]
 
 --- Export Types ---
@@ -1457,6 +1471,85 @@ function Compkiller:_Rounding(num: number, numDecimalPlaces: number) : number
 	return math.floor(num * mult + 0.5) / mult;
 end;
 
+-- Add shake animation for feedback (errors, alerts, etc)
+function Compkiller:_Shake(element: Instance, intensity: number)
+	intensity = intensity or 3
+	local originalPos = element.Position
+	
+	for i = 1, 4 do
+		Compkiller:_Animation(element, TweenInfo.new(0.05, Enum.EasingStyle.Linear), {
+			Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + (intensity * (i % 2 == 0 and 1 or -1)), originalPos.Y.Scale, originalPos.Y.Offset)
+		})
+		task.wait(0.05)
+	end
+	
+	Compkiller:_Animation(element, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Position = originalPos
+	})
+end;
+
+-- Add pulse/glow animation
+function Compkiller:_Pulse(element: Instance, duration: number)
+	duration = duration or 0.8
+	local originalSize = element.Size
+	
+	Compkiller:_Animation(element, TweenInfo.new(duration / 2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = UDim2.new(originalSize.X.Scale * 1.1, originalSize.X.Offset, originalSize.Y.Scale * 1.1, originalSize.Y.Offset)
+	})
+	
+	task.wait(duration / 2)
+	
+	Compkiller:_Animation(element, TweenInfo.new(duration / 2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+		Size = originalSize
+	})
+end;
+
+-- Add shimmer/shine effect for premium feel
+function Compkiller:_Shimmer(element: Frame)
+	local Shine = Instance.new("Frame")
+	Shine.Name = "Shimmer"
+	Shine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Shine.BackgroundTransparency = 0.7
+	Shine.BorderSizePixel = 0
+	Shine.Size = UDim2.new(0, 30, 2, 0)
+	Shine.Position = UDim2.new(0, -30, -0.5, 0)
+	Shine.Rotation = 45
+	Shine.ZIndex = element.ZIndex + 100
+	Shine.Parent = element
+	
+	local Gradient = Instance.new("UIGradient")
+	Gradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.5, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
+	Gradient.Parent = Shine
+	
+	-- Animate shimmer across element
+	Compkiller:_Animation(Shine, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+		Position = UDim2.new(1, 30, -0.5, 0)
+	})
+	
+	task.delay(1.2, function()
+		Shine:Destroy()
+	end)
+end;
+
+-- Add rainbow color cycling animation
+function Compkiller:_Rainbow(element: Instance, property: string, duration: number)
+	property = property or "BackgroundColor3"
+	duration = duration or 5
+	
+	task.spawn(function()
+		local hue = 0
+		while element and element.Parent do
+			hue = (hue + 0.01) % 1
+			element[property] = Color3.fromHSV(hue, 0.8, 1)
+			task.wait(duration / 100)
+		end
+	end)
+end;
+
 -- Enhanced animation function with smoother default easing
 function Compkiller:_Animation(Self: Instance , Info: TweenInfo , Property :{[K] : V})
 	-- Use improved default: Quint easing for smoother, more professional animations
@@ -1467,6 +1560,7 @@ function Compkiller:_Animation(Self: Instance , Info: TweenInfo , Property :{[K]
 	return Tween;
 end;
 
+-- Enhanced input with click ripple effect
 function Compkiller:_Input(Frame : Frame , Callback : () -> ()) : TextButton
 	local Button = Instance.new('TextButton',Frame);
 
@@ -1476,7 +1570,37 @@ function Compkiller:_Input(Frame : Frame , Callback : () -> ()) : TextButton
 	Button.TextTransparency = 1;
 
 	if Callback then
-		Button.MouseButton1Click:Connect(Callback);
+		Button.MouseButton1Click:Connect(function()
+			-- Create ripple effect on click
+			local Ripple = Instance.new("Frame")
+			Ripple.Name = "Ripple"
+			Ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+			Ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Ripple.BackgroundTransparency = 0.5
+			Ripple.BorderSizePixel = 0
+			Ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+			Ripple.Size = UDim2.new(0, 0, 0, 0)
+			Ripple.ZIndex = Frame.ZIndex + 50
+			Ripple.Parent = Frame
+			
+			local Corner = Instance.new("UICorner")
+			Corner.CornerRadius = UDim.new(1, 0)
+			Corner.Parent = Ripple
+			
+			local maxSize = math.max(Frame.AbsoluteSize.X, Frame.AbsoluteSize.Y) * 2
+			
+			-- Expand ripple
+			Compkiller:_Animation(Ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = UDim2.new(0, maxSize, 0, maxSize),
+				BackgroundTransparency = 1
+			})
+			
+			task.delay(0.5, function()
+				Ripple:Destroy()
+			end)
+			
+			Callback();
+		end);
 	end;
 
 	return Button;
@@ -1711,10 +1835,29 @@ function Compkiller.__SIGNAL(default)
 	return Binds;
 end;
 
+-- Enhanced hover with scale animation
 function Compkiller:_Hover(Frame: Frame , OnHover: () -> any?, Release: () -> any?)
-	Frame.MouseEnter:Connect(OnHover);
+	Frame.MouseEnter:Connect(function()
+		-- Add subtle scale animation on hover
+		if Frame:IsA("Frame") or Frame:IsA("ImageLabel") or Frame:IsA("ImageButton") then
+			local originalSize = Frame.Size
+			Compkiller:_Animation(Frame, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = UDim2.new(originalSize.X.Scale * 1.02, originalSize.X.Offset, originalSize.Y.Scale * 1.02, originalSize.Y.Offset)
+			})
+		end
+		OnHover();
+	end);
 
-	Frame.MouseLeave:Connect(Release);
+	Frame.MouseLeave:Connect(function()
+		-- Return to original size
+		if Frame:IsA("Frame") or Frame:IsA("ImageLabel") or Frame:IsA("ImageButton") then
+			local originalSize = Frame:GetAttribute("OriginalSize")
+			if not originalSize then
+				Frame:SetAttribute("OriginalSize", tostring(Frame.Size))
+			end
+		end
+		Release();
+	end);
 end;
 
 function Compkiller.__CONFIG(config , default)
@@ -2781,20 +2924,30 @@ function Compkiller:_AddColorPickerPanel(Button: ImageButton , Callback: (Color:
 			ColorPickerWindow.AnchorPoint = Vector2.new(0.5,0)
 		end;
 
+		-- Enhanced color picker opening with bounce and scale
 		if bool then
 
 			if not IsSame then
 				ColorPickerWindow.Position = DropPosition
+				ColorPickerWindow.Size = UDim2.new(0, 100, 0, 100)
 			end;
 
-			Compkiller:_Animation(ColorPickerWindow,Tween2,{
+			-- Bouncy scale-up animation
+			Compkiller:_Animation(ColorPickerWindow,TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
 				BackgroundTransparency = 0,
 				Size = UDim2.new(0, 175, 0, 200)
 			});
 
-			Compkiller:_Animation(ColorPickerWindow,Tween,{
+			Compkiller:_Animation(ColorPickerWindow,TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
 				Position = MainPosition,
 			});
+			
+			-- Add shimmer effect when opening
+			task.delay(0.3, function()
+				if ColorPickerWindow and ColorPickerWindow.Parent then
+					Compkiller:_Shimmer(ColorPickerWindow)
+				end
+			end)
 
 			Compkiller:_Animation(UIStroke_8,Tween,{
 				Transparency = 0
@@ -3863,12 +4016,25 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 
 		local Toggle = Block:AddLink('Toggle' , Config.Default);
 
+		-- Enhanced toggle click with satisfying animations
 		Toggle.Input.MouseButton1Click:Connect(function()
 			Config.Default = not Config.Default;
 
 			Toggle.ChangeValue(Config.Default);
 
 			Block:SetTransparency((Config.Default and 0.1) or 0.3);
+			
+			-- Add pulse effect on toggle
+			Compkiller:_Pulse(Toggle.Root, 0.4);
+			
+			-- Add shimmer when enabling
+			if Config.Default then
+				task.delay(0.2, function()
+					if Toggle.Root and Toggle.Root.Parent then
+						Compkiller:_Shimmer(Toggle.Root);
+					end
+				end)
+			end
 
 			Config.Callback(Config.Default);
 		end);
@@ -4171,6 +4337,8 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 		end);
 
 		Compkiller:_Input(Frame,function()
+			-- Add shimmer effect on button click for premium feel
+			Compkiller:_Shimmer(Frame);
 			Config.Callback();
 		end);
 
@@ -5141,14 +5309,19 @@ function Compkiller:_LoadElement(Parent: Frame , EnabledLine: boolean , Signal)
 			Config.Callback(Config.Default);
 		end);
 
+		-- Enhanced dropdown icon rotation with smooth spin
 		repi.EventOut:Connect(function(v)
 			if v then
-				Compkiller:_Animation(MainButton,TweenInfo.new(0.2),{
-					Rotation = -180
+				-- Smooth rotation animation when opening
+				Compkiller:_Animation(MainButton,TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
+					Rotation = -180,
+					Size = UDim2.new(0, 15, 0, 15)  -- Slightly bigger when open
 				})
 			else
-				Compkiller:_Animation(MainButton,TweenInfo.new(0.2),{
-					Rotation = 0
+				-- Smooth rotation back when closing
+				Compkiller:_Animation(MainButton,TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+					Rotation = 0,
+					Size = UDim2.new(0, 13, 0, 13)  -- Return to normal size
 				})
 			end;
 		end)
@@ -5520,6 +5693,27 @@ function Compkiller.new(Config : Window)
 			MainFrame.Visible = true;
 		end;
 	end)
+	
+	-- Add subtle breathing animation to main window for life
+	task.spawn(function()
+		while MainFrame and MainFrame.Parent do
+			if WindowOpen:GetValue() then
+				-- Very subtle scale breathing
+				Compkiller:_Animation(MainFrame, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Size = UDim2.new(Config.Scale.X.Scale, Config.Scale.X.Offset + 2, Config.Scale.Y.Scale, Config.Scale.Y.Offset + 2)
+				})
+				task.wait(3)
+				if MainFrame and MainFrame.Parent and WindowOpen:GetValue() then
+					Compkiller:_Animation(MainFrame, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Size = Config.Scale
+					})
+					task.wait(3)
+				end
+			else
+				task.wait(1)
+			end
+		end
+	end)
 
 	-- Enhanced window opening animation with elegant easing
 	Compkiller:_Animation(MainFrame,TweenInfo.new(0.8,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out),{
@@ -5575,6 +5769,24 @@ function Compkiller.new(Config : Window)
 	CompLogo.Position = UDim2.new(0, 9, 0, 7)
 	CompLogo.Size = UDim2.new(0, 45, 0, 45)
 	CompLogo.Image = Config.Logo
+	
+	-- Add floating animation to logo for dynamic feel
+	task.spawn(function()
+		while CompLogo and CompLogo.Parent do
+			Compkiller:_Animation(CompLogo, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(0, 9, 0, 10),
+				Rotation = 5
+			})
+			task.wait(2.5)
+			if CompLogo and CompLogo.Parent then
+				Compkiller:_Animation(CompLogo, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Position = UDim2.new(0, 9, 0, 7),
+					Rotation = -5
+				})
+				task.wait(2.5)
+			end
+		end
+	end)
 
 	WindowLabel.Name = Compkiller:_RandomString()
 	WindowLabel.Parent = TabFrame
@@ -5618,6 +5830,40 @@ function Compkiller.new(Config : Window)
 
 	UICorner_3.CornerRadius = UDim.new(1, 0)
 	UICorner_3.Parent = SelectionFrame
+	
+	-- Add glow effect to selection frame
+	local Glow = Instance.new("Frame")
+	Glow.Name = "Glow"
+	Glow.AnchorPoint = Vector2.new(0.5, 0.5)
+	Glow.BackgroundColor3 = Compkiller.Colors.Highlight
+	Glow.BackgroundTransparency = 0.7
+	Glow.BorderSizePixel = 0
+	Glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+	Glow.Size = UDim2.new(1, 8, 1, 8)
+	Glow.ZIndex = SelectionFrame.ZIndex - 1
+	Glow.Parent = SelectionFrame
+	
+	local GlowCorner = Instance.new("UICorner")
+	GlowCorner.CornerRadius = UDim.new(1, 0)
+	GlowCorner.Parent = Glow
+	
+	-- Pulse glow animation
+	task.spawn(function()
+		while Glow and Glow.Parent do
+			Compkiller:_Animation(Glow, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				BackgroundTransparency = 0.9,
+				Size = UDim2.new(1, 12, 1, 12)
+			})
+			task.wait(1.2)
+			if Glow and Glow.Parent then
+				Compkiller:_Animation(Glow, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					BackgroundTransparency = 0.7,
+					Size = UDim2.new(1, 8, 1, 8)
+				})
+				task.wait(1.2)
+			end
+		end
+	end)
 
 	TabButtonScrollingFrame.Name = Compkiller:_RandomString()
 	TabButtonScrollingFrame.Parent = TabButtons
@@ -5755,45 +6001,60 @@ function Compkiller.new(Config : Window)
 			return;	
 		end;
 
+		-- Enhanced window opening with dramatic entrance animation
 		if v then
-			Compkiller:_Animation(MainFrame,TweenInfo.new(0.2),{
+			-- Scale up from smaller with bounce
+			Compkiller:_Animation(MainFrame,TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
 				Size = Config.Scale
 			})
 
-			Compkiller:_Animation(TabButtonScrollingFrame,TweenInfo.new(0.35),{
+			-- Staggered fade-in animations for depth
+			Compkiller:_Animation(TabButtonScrollingFrame,TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out),{
 				Position = UDim2.new(0.5, 0, 0.5, 0)
 			})
 
-			Compkiller:_Animation(CompLogo,TweenInfo.new(0.2),{
-				ImageTransparency = 0
+			-- Logo spins in
+			Compkiller:_Animation(CompLogo,TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
+				ImageTransparency = 0,
+				Rotation = 360
 			})
+			
+			task.delay(0.1, function()
+				Compkiller:_Animation(WindowLabel,TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+					TextTransparency = 0,
+					Position = UDim2.new(0, 60, 0, 17)
+				})
+			end)
 
-			Compkiller:_Animation(WindowLabel,TweenInfo.new(0.2),{
-				TextTransparency = 0
-			})
+			task.delay(0.15, function()
+				Compkiller:_Animation(UserProfile,TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
+					ImageTransparency = 0,
+					Size = UDim2.new(0, 35, 0, 35)
+				})
+			end)
 
-			Compkiller:_Animation(UserProfile,TweenInfo.new(0.2),{
-				ImageTransparency = 0
-			})
+			task.delay(0.2, function()
+				Compkiller:_Animation(UserText,TweenInfo.new(0.3),{
+					TextTransparency = 0
+				})
+			end)
 
-			Compkiller:_Animation(UserText,TweenInfo.new(0.2),{
-				TextTransparency = 0
-			})
+			task.delay(0.25, function()
+				Compkiller:_Animation(ExpireText,TweenInfo.new(0.3),{
+					TextTransparency = 0.5
+				})
+			end)
 
-			Compkiller:_Animation(ExpireText,TweenInfo.new(0.2),{
-				TextTransparency = 0.5
-			})
-
-			Compkiller:_Animation(MainFrame,TweenInfo.new(0.2),{
+			Compkiller:_Animation(MainFrame,TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
 				BackgroundTransparency = 0
 			})
 
-			Compkiller:_Animation(LineFrame1,TweenInfo.new(0.3),{
+			Compkiller:_Animation(LineFrame1,TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
 				BackgroundTransparency = 0,
 				Size = UDim2.new(0, 20, 1, 0)
 			})
 
-			Compkiller:_Animation(TabFrame,TweenInfo.new(0.2),{
+			Compkiller:_Animation(TabFrame,TweenInfo.new(0.3),{
 				BackgroundTransparency = TabFrameBaseTrans
 			})
 		else
@@ -6222,6 +6483,23 @@ function Compkiller.new(Config : Window)
 
 		UICorner.CornerRadius = UDim.new(0, 4)
 		UICorner.Parent = Highlight
+		
+		-- Add slide-in animation for new tab buttons
+		TabButton.Position = UDim2.new(0, -100, 0, 0)
+		Icon.ImageTransparency = 1
+		TabNameLabel.TextTransparency = 1
+		
+		task.delay(0.1 * #TabButtonScrollingFrame:GetChildren(), function()
+			Compkiller:_Animation(TabButton, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+				Position = UDim2.new(0, 0, 0, 0)
+			})
+			Compkiller:_Animation(Icon, TweenInfo.new(0.4), {
+				ImageTransparency = 0.5
+			})
+			Compkiller:_Animation(TabNameLabel, TweenInfo.new(0.4), {
+				TextTransparency = 0.5
+			})
+		end)
 
 		-- Creating Container --
 
@@ -6557,10 +6835,14 @@ function Compkiller.new(Config : Window)
 			table.insert(TabArgs.Tabs,Id)
 
 			Compkiller:_Input(Frame,function()
+				-- Enhanced tab switching with animations
 				for i,v in next , TabArgs.Tabs do
 					if v.Root == Frame then
 						TabArgs.__Current = v;
-
+						
+						-- Pulse animation on tab switch
+						Compkiller:_Pulse(Frame, 0.3);
+						
 						v.Remote:Fire(true);
 					else
 						v.Remote:Fire(false);
@@ -7446,6 +7728,19 @@ function Compkiller.new(Config : Window)
 			Icon.ZIndex = 15
 			Icon.Image = "rbxassetid://10734941499"
 			Icon.ImageTransparency = 1;
+			
+			-- Add subtle spin animation when hovering save button
+			Compkiller:_Hover(Frame, function()
+				task.spawn(function()
+					for i = 0, 360, 30 do
+						if Icon.Parent then
+							Icon.Rotation = i
+							task.wait(0.02)
+						end
+					end
+					Icon.Rotation = 0
+				end)
+			end, function() end)
 
 			LoadButton.Name = Compkiller:_RandomString()
 			LoadButton.Parent = LinkValues
@@ -8340,6 +8635,19 @@ function Compkiller.new(Config : Window)
 			-- Larger corner radius for premium modern look
 			UICorner.CornerRadius = UDim.new(0, 10)
 			UICorner.Parent = Section
+			
+			-- Add entrance animation for new sections (slide + fade)
+			Section.Position = UDim2.new(1, 50, 0, 0)
+			Section.BackgroundTransparency = 1
+			
+			task.delay(0.05, function()
+				Compkiller:_Animation(Section, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+					Position = UDim2.new(1, 0, 0, 0)
+				})
+				Compkiller:_Animation(Section, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+					BackgroundTransparency = 0
+				})
+			end)
 
 			UIStroke.Color = Compkiller.Colors.StrokeColor
 			UIStroke.Parent = Section
@@ -8545,18 +8853,26 @@ function Compkiller.new(Config : Window)
 				end;
 			end);
 
+			-- Enhanced section toggle with bouncy rotation
 			Compkiller:_Input(Header,function()
 				IsOpen = not IsOpen;
 
 				if IsOpen then
-					Compkiller:_Animation(SectionClose,TweenInfo.new(0.35),{
-						Rotation = 0
+					-- Bouncy rotation animation when opening
+					Compkiller:_Animation(SectionClose,TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),{
+						Rotation = 0,
+						ImageTransparency = 0.4
 					});
 				else
-					Compkiller:_Animation(SectionClose,TweenInfo.new(0.35),{
-						Rotation = -180
+					-- Smooth rotation when closing
+					Compkiller:_Animation(SectionClose,TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{
+						Rotation = -180,
+						ImageTransparency = 0.3
 					});
 				end;
+
+				-- Pulse the header for visual feedback
+				Compkiller:_Pulse(Header, 0.3);
 
 				refresh();
 
@@ -8970,15 +9286,64 @@ function Compkiller.new(Config : Window)
 		MovementFrame.Size = UDim2.new(1, 0, 1, 0)
 		MovementFrame.ZIndex = 9
 
-		Compkiller:Drag(MovementFrame,MainFrame,0.1)
+	Compkiller:Drag(MovementFrame,MainFrame,0.1)
+	
+	-- Add floating particles around window for ambience
+	task.spawn(function()
+		for i = 1, 8 do
+			task.wait(0.3)
+			if MainFrame and MainFrame.Parent then
+				local Particle = Instance.new("Frame")
+				Particle.Name = "Particle"
+				Particle.AnchorPoint = Vector2.new(0.5, 0.5)
+				Particle.BackgroundColor3 = Compkiller.Colors.Highlight
+				Particle.BackgroundTransparency = 0.7
+				Particle.BorderSizePixel = 0
+				Particle.Size = UDim2.new(0, math.random(3, 6), 0, math.random(3, 6))
+				Particle.Position = UDim2.new(math.random(0, 100) / 100, 0, math.random(0, 100) / 100, 0)
+				Particle.ZIndex = 1
+				Particle.Parent = MainFrame
+				
+				local Corner = Instance.new("UICorner")
+				Corner.CornerRadius = UDim.new(1, 0)
+				Corner.Parent = Particle
+				
+				-- Animate particle floating upward
+				Compkiller:_Animation(Particle, TweenInfo.new(math.random(3, 5), Enum.EasingStyle.Linear), {
+					Position = UDim2.new(Particle.Position.X.Scale + (math.random(-20, 20) / 100), 0, -0.2, 0),
+					BackgroundTransparency = 1
+				})
+				
+				task.delay(5, function()
+					if Particle then Particle:Destroy() end
+				end)
+			end
+		end
+	end)
 
-		SelectionFrame.Position = UDim2.new(1, 5, 0, 28)
-		SelectionFrame.Size = UDim2.new(0, 8, 0, 22)
+	SelectionFrame.Position = UDim2.new(1, 5, 0, 28)
+	SelectionFrame.Size = UDim2.new(0, 8, 0, 22)
 
 		table.insert(Compkiller.Elements.Highlight,{
 			Element = SelectionFrame,
 			Property = "BackgroundColor3"
 		});
+		
+		-- Add glowing pulse animation to selection indicator
+		task.spawn(function()
+			while SelectionFrame and SelectionFrame.Parent do
+				Compkiller:_Animation(SelectionFrame, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Size = UDim2.new(0, 10, 0, 24)
+				})
+				task.wait(1.5)
+				if SelectionFrame and SelectionFrame.Parent then
+					Compkiller:_Animation(SelectionFrame, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Size = UDim2.new(0, 8, 0, 22)
+					})
+					task.wait(1.5)
+				end
+			end
+		end)
 
 		while true do task.wait(0.01);
 			BlurElement.Size = UDim2.new(1, TabFrame.AbsoluteSize.X - 35, 1, 0);
@@ -9366,11 +9731,21 @@ function Compkiller:Loader(IconId,Duration)
 	local Event = Instance.new('BindableEvent');
 
 	task.delay(0.4,function()
-		-- Dramatic icon entrance with back easing
+		-- Dramatic icon entrance with back easing and rotation
 		Compkiller:_Animation(Icon,TweenInfo.new(1.0,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
 			ImageTransparency = 0,
-			Size = UDim2.new(0, 200, 0, 200)
+			Size = UDim2.new(0, 200, 0, 200),
+			Rotation = 360
 		});
+		
+		-- Add spinning animation while loading
+		task.spawn(function()
+			local startTime = tick()
+			while Icon and Icon.Parent and (tick() - startTime) < (Duration or 4.5) do
+				Icon.Rotation = Icon.Rotation + 2
+				task.wait(0.03)
+			end
+		end)
 
 		task.delay(0.3,function()
 			Compkiller:_Animation(Vignette,TweenInfo.new(4.5,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut),{
