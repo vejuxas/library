@@ -9985,29 +9985,69 @@ function Compkiller:KeySystem(validKeys, duration)
 	validKeys = validKeys or {}
 	duration = duration or "Never"
 	
-	local KeySystemActive = true
-	local ExpiryDate = "NEVER"
+	-- Check if key is already saved and valid
+	local SavePath = "Compkiller-Keys/KeyData.json"
 	
-	-- Calculate expiry date based on duration
-	local function CalculateExpiry(dur)
-		if dur == "Never" then
-			return "NEVER"
-		elseif dur == "New Key" then
-			return "NEW KEY"
-		elseif dur == "1 Day" then
-			local expiry = os.time() + (24 * 60 * 60)
-			return os.date("%d/%m/%Y", expiry)
-		elseif dur == "1 Week" then
-			local expiry = os.time() + (7 * 24 * 60 * 60)
-			return os.date("%d/%m/%Y", expiry)
-		elseif dur == "2 Weeks" then
-			local expiry = os.time() + (14 * 24 * 60 * 60)
-			return os.date("%d/%m/%Y", expiry)
-		end
-		return "NEVER"
+	if not isfolder("Compkiller-Keys") then
+		makefolder("Compkiller-Keys")
 	end
 	
-	ExpiryDate = CalculateExpiry(duration)
+	local function CalculateExpiryTime(dur)
+		if dur == "Never" then
+			return math.huge
+		elseif dur == "New Key" then
+			return math.huge
+		elseif dur == "1 Day" then
+			return os.time() + (24 * 60 * 60)
+		elseif dur == "1 Week" then
+			return os.time() + (7 * 24 * 60 * 60)
+		elseif dur == "2 Weeks" then
+			return os.time() + (14 * 24 * 60 * 60)
+		end
+		return 0
+	end
+	
+	local function FormatExpiryDate(timestamp)
+		if timestamp == math.huge then
+			return duration == "New Key" and "NEW KEY" or "NEVER"
+		end
+		return os.date("%d/%m/%Y", timestamp)
+	end
+	
+	-- Check if we have a valid saved key
+	if isfile(SavePath) then
+		local success, data = pcall(function()
+			return HttpService:JSONDecode(readfile(SavePath))
+		end)
+		
+		if success and data and data.ExpiryTime then
+			-- Check if key is still valid
+			if os.time() < data.ExpiryTime then
+				-- Key still valid, skip verification
+				return {
+					Duration = data.Duration or duration,
+					ExpiryDate = FormatExpiryDate(data.ExpiryTime)
+				}
+			end
+		end
+	end
+	
+	-- If "Never" duration, skip key system entirely
+	if duration == "Never" then
+		local expiryTime = math.huge
+		writefile(SavePath, HttpService:JSONEncode({
+			Duration = duration,
+			ExpiryTime = expiryTime,
+			RedeemedAt = os.time()
+		}))
+		return {
+			Duration = duration,
+			ExpiryDate = "NEVER"
+		}
+	end
+	
+	local KeySystemActive = true
+	local ExpiryDate = "NEVER"
 	
 	local KeySystemGui = Instance.new("ScreenGui")
 	KeySystemGui.Name = "CompkillerKeySystem"
@@ -10108,11 +10148,11 @@ function Compkiller:KeySystem(validKeys, duration)
 	DurationDisplay.Parent = KeyBox
 	
 	local SubmitBtn = Instance.new("TextButton")
-	SubmitBtn.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
+	SubmitBtn.BackgroundColor3 = Color3.fromRGB(25, 32, 45)
 	SubmitBtn.BackgroundTransparency = 0
 	SubmitBtn.BorderSizePixel = 0
-	SubmitBtn.Position = UDim2.new(0, 15, 0, 102)
-	SubmitBtn.Size = UDim2.new(1, -30, 0, 26)
+	SubmitBtn.Position = UDim2.new(0, 15, 0, 100)
+	SubmitBtn.Size = UDim2.new(1, -30, 0, 28)
 	SubmitBtn.AnchorPoint = Vector2.new(0, 0)
 	SubmitBtn.Font = Enum.Font.GothamSemibold
 	SubmitBtn.Text = "Redeem Key"
@@ -10141,7 +10181,7 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	local Status = Instance.new("TextLabel")
 	Status.BackgroundTransparency = 1
-	Status.Position = UDim2.new(0, 10, 0, 132)
+	Status.Position = UDim2.new(0, 10, 0, 130)
 	Status.Size = UDim2.new(1, -20, 0, 10)
 	Status.Font = Enum.Font.Gotham
 	Status.Text = ""
@@ -10162,11 +10202,11 @@ function Compkiller:KeySystem(validKeys, duration)
 	
 	-- Button hover effects
 	SubmitBtn.MouseEnter:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(28, 35, 48)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 45, 60)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
 	end)
 	SubmitBtn.MouseLeave:Connect(function()
-		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(18, 22, 30)}):Play()
+		TweenService:Create(SubmitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 32, 45)}):Play()
 		TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
 	end)
 	
@@ -10197,7 +10237,16 @@ function Compkiller:KeySystem(validKeys, duration)
 		end
 		
 		if ValidateKey(key) then
-			-- Success
+			-- Success - Save key data
+			local expiryTime = CalculateExpiryTime(duration)
+			ExpiryDate = FormatExpiryDate(expiryTime)
+			
+			writefile(SavePath, HttpService:JSONEncode({
+				Duration = duration,
+				ExpiryTime = expiryTime,
+				RedeemedAt = os.time()
+			}))
+			
 			Status.Text = "✓ Access Granted!"
 			Status.TextColor3 = Color3.fromRGB(0, 255, 200)
 			
@@ -10236,10 +10285,22 @@ function Compkiller:KeySystem(validKeys, duration)
 	repeat task.wait(0.1) until not KeySystemActive
 	
 	-- Return expiry information
-	return {
+	local savedData = {
 		Duration = duration,
 		ExpiryDate = ExpiryDate
 	}
+	
+	-- Read saved data to get actual expiry
+	if isfile(SavePath) then
+		local success, data = pcall(function()
+			return HttpService:JSONDecode(readfile(SavePath))
+		end)
+		if success and data then
+			savedData.ExpiryDate = FormatExpiryDate(data.ExpiryTime)
+		end
+	end
+	
+	return savedData
 end
 
 return Compkiller;
